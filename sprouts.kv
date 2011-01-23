@@ -1,0 +1,29 @@
+#:kivy 1.0
+#Fichier de règle de reoresentation graphique :
+#couleur, forme, taille, etc.
+
+<Point>:
+#Toujours éxécuté dans le constructeur, c'est l'équivalent du with...(que pour canvas)
+    canvas:
+        Color:
+            rgb: (1, 0, 1)
+        Ellipse:
+         #A gauche, ce qui appartient a l'objet
+            pos: self.pos
+            size: self.size
+
+<Tracer>:
+    canvas:
+        Color:
+            rgb: (.5, 0, .5)
+        Ellipse:
+        #self.pos = current position du widget
+            pos: self.pos
+            size: self.size
+<Ligne>:
+    canvas:
+        Color:
+            rgb:(0, 1, 0) if self.valid else (1, 0, 0)
+        #pour une courbe ==> creer un objet graphique
+        Line:
+            points: self.points
