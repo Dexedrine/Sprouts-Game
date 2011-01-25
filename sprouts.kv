@@ -12,17 +12,10 @@
             pos: self.pos
             size: self.size
 
-<Tracer>:
-    canvas:
-        Color:
-            rgb: (.5, 0, .5)
-        Ellipse:
-        #self.pos = current position du widget
-            pos: self.pos
-            size: self.size
 <Ligne>:
     canvas:
         Color:
+        #si valid : vert sinon rouge
             rgb:(0, 1, 0) if self.valid else (1, 0, 0)
         #pour une courbe ==> creer un objet graphique
         Line:
