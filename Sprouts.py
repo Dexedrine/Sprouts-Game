@@ -42,6 +42,8 @@ class Tracer(Widget):
         '''
         super(Tracer, self).__init__(**kwargs)
         self.ligne = None
+        self.bbox = [(), ()]
+
 
     def on_touch_down(self, touch):
         '''Methode on_touch_down() : quand on down un event
@@ -67,10 +69,23 @@ class Tracer(Widget):
 
     def on_touch_move(self, touch):
         '''methode on_touch_move(): quand on move un event
-           si tout est ok dans on_touch_down(), on trace
+        si tout est ok dans on_touch_down(), on trace
         '''
+
         if self.ligne:
             self.ligne.points = self.ligne.points + [touch.x, touch.y]
+            if self.ligne.minx > touch.x:
+                self.ligne.minx = touch.x
+            if self.ligne.miny > touch.y:
+                self.ligne.miny = touch.y
+            if self.ligne.maxx < touch.x:
+                self.ligne.maxx = touch.x
+            if self.ligne.maxy < touch.y:
+                self.ligne.maxy = touch.y
+            print self.ligne.minx, 'minx'
+            print self.ligne.miny, 'miny'
+            print self.ligne.maxx, 'maxx'
+            print self.ligne.maxy, 'maxy'
 
 
        
@@ -97,14 +112,27 @@ class Tracer(Widget):
                 continue
             if child.degre > 2:
                 continue
-            if self.ligne.first == child:
-                continue
+            #if self.ligne.first == child:
+                #continue
             print 'point arrivée'
             self.ligne.first.degre += 1
             child.degre += 1
             print 'degre first' , self.ligne.first.degre
             print 'degre point :', child.degre 
             self.ligne.valid = True
+            '''definition d'une Bbox autour d'une ligne definie par deux points :
+               first et child
+               on l'ajout a une variable self.bbox
+               on verifie si la ligne tracee, donc sa bbox, est dans une bbox
+               (in_bbox) return true if deds
+               existante autre que la sienne
+               si non : valid est True
+               si oui, re un test avec un line_intersection et chnagement de
+               valid en consequence
+            '''
+            self.bbox = [(self.ligne.minx, self.ligne.maxy), (self.ligne.maxx,
+                                                              self.ligne.miny)]
+            #definition un rectangle, l'afficher
             break
 
         if self.ligne.valid is False:
@@ -114,10 +142,16 @@ class Tracer(Widget):
         self.ligne = None    
 
 class Ligne(Widget):
+    w, h = Window.size
     #declaration d'une nouvelle proporiété
     points = ListProperty([])
     valid = BooleanProperty(True)
     first = ObjectProperty
+    minx = NumericProperty(w)
+    miny = NumericProperty(h)
+    maxx = NumericProperty(0)
+    maxy = NumericProperty(0)
+
     
 
 class PointApp(App):
@@ -131,7 +165,7 @@ class PointApp(App):
         #root
 
         for i in xrange(10):
-            point = Point(size=(10, 10), pos =(random()*w, random()*h))
+            point = Point(size=(50, 50), pos =(random()*w, random()*h))
             root.add_widget(point)
         root.add_widget(Tracer())
         return root
