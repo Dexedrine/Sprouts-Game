@@ -87,6 +87,12 @@ class Tracer(Widget):
             print self.ligne.miny, 'miny'
             print self.ligne.maxx, 'maxx'
             print self.ligne.maxy, 'maxy'
+            tailleLigne = tailleLigne + 1 # on rajoute une taille en plus du fait de la creation du nouveau point.
+        '''
+        	On affiche ici pour tester si les bbox marche correctement 
+        	proposition : draw.rectangle(box)
+        '''
+        
 
 
        
@@ -121,6 +127,17 @@ class Tracer(Widget):
             print 'degre first' , self.ligne.first.degre
             print 'degre point :', child.degre 
             self.ligne.valid = True
+            
+            ''' ICI on doit faire la creation du nouveau POINT ! 
+            	- on regarde la taille et on l'a divise par deux pour trouver le milieu de la ligne
+            	- on place au coordonnée indiquer par le nombre obtenu le nouveau point (?) 
+            '''
+            position = self.ligne.tailleLigne / 2
+            ''' A COMPLETER , probleme de comprehension il est tard '''
+            
+            
+            
+            
             '''definition d'une Bbox autour d'une ligne definie par deux points :
                first et child
                on l'ajout a une variable self.bbox
@@ -149,8 +166,10 @@ class Ligne(Widget):
     miny = NumericProperty(h)
     maxx = NumericProperty(0)
     maxy = NumericProperty(0)
-
-    
+    '''Je n'ai pas trouver d'autre solution ( à toi de voir pour quelque chose de mieux    
+	je veux avoir la taille de la ligne afin de la diviser par deux à la fin.
+    '''
+    tailleLigne = NumericProperty(0)
 
 class PointApp(App):
     def build(self):
