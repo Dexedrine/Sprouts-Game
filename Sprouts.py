@@ -62,7 +62,7 @@ class Tracer(Widget):
             if child.degre > 2:
                 continue
             print child, 'je suis touché, argh je me meurs trop sa mère'
-            self.ligne = Ligne(points=[touch.x, touch.y], valid=True, first=child)
+            self.ligne = Ligne(points=[child.center_x, child.center_y], valid=True, first=child)
             self.add_widget(self.ligne)
             break
 
@@ -70,6 +70,7 @@ class Tracer(Widget):
     def on_touch_move(self, touch):
         '''methode on_touch_move(): quand on move un event
         si tout est ok dans on_touch_down(), on trace
+        calcul en live des x et y minimaux 
         '''
 
         if self.ligne:
@@ -130,9 +131,6 @@ class Tracer(Widget):
                si oui, re un test avec un line_intersection et chnagement de
                valid en consequence
             '''
-            self.bbox = [(self.ligne.minx, self.ligne.maxy), (self.ligne.maxx,
-                                                              self.ligne.miny)]
-            #definition un rectangle, l'afficher
             break
 
         if self.ligne.valid is False:
