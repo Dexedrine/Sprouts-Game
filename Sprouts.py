@@ -16,6 +16,7 @@ from kivy.graphics import Color, Ellipse
 from random import random, randint
 from kivy.properties import ListProperty, BooleanProperty, NumericProperty, ObjectProperty
 from kivy.graphics.vertex_instructions import Line
+from kivy.vector import Vector
 
 #DEBUT du code
 
@@ -72,8 +73,14 @@ class Tracer(Widget):
         si tout est ok dans on_touch_down(), on trace
         calcul en live des x et y minimaux 
         '''
+        #on doit faire que la ligne "commence" a partir du bord du cercle 
+        #pour cela on calcul la distance centre/point
 
         if self.ligne:
+            # if ((touch.x, touch.y)-(child.center_x, child.center_y)) <=
+            #hild.radius):
+
+
             self.ligne.points = self.ligne.points + [touch.x, touch.y]
             if self.ligne.minx > touch.x:
                 self.ligne.minx = touch.x
@@ -158,13 +165,24 @@ class PointApp(App):
         # w, h = canvas.size(); 
         root = Widget()
         #root = ScatterPlane()
-        w, h = Window.size
+        w = Window.width-50
+        h = Window.height-50 
         #on ajoute la liste des positions des Point que l'on crées à la liste
         #root
+        listPoint = []
 
-        for i in xrange(10):
-            point = Point(size=(50, 50), pos =(random()*w, random()*h))
-            root.add_widget(point)
+        while len(listPoint) != 10 :
+            point = Point(size=(50, 50),
+                          pos =(random()*w, random()*h))
+            ok = True
+            v = Vector(point.center)
+            for p in listPoint:
+                if v.distance(p.center) <= 50:
+                    ok = False
+                    break
+            if ok :
+                listPoint.append(point)
+                root.add_widget(point)
         root.add_widget(Tracer())
         return root
 
