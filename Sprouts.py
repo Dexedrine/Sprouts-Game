@@ -94,14 +94,7 @@ class Tracer(Widget):
             print self.ligne.miny, 'miny'
             print self.ligne.maxx, 'maxx'
             print self.ligne.maxy, 'maxy'
-            tailleLigne = tailleLigne + 1 # on rajoute une taille en plus du fait de la creation du nouveau point.
-        '''
-        	On affiche ici pour tester si les bbox marche correctement 
-        	proposition : draw.rectangle(box)
-        '''
-        
-
-
+            #tailleLigne = tailleLigne + 1 # on rajoute une taille en plus du fait de la creation du nouveau point.
        
     def on_touch_up(self, touch):
         '''methode on_touch_up() = quand on up un event
@@ -139,22 +132,9 @@ class Tracer(Widget):
             	- on regarde la taille et on l'a divise par deux pour trouver le milieu de la ligne
             	- on place au coordonnée indiquer par le nombre obtenu le nouveau point (?) 
             '''
-            position = self.ligne.tailleLigne / 2
+            #position = self.ligne.tailleLigne / 2
             ''' A COMPLETER , probleme de comprehension il est tard '''
-            
-            
-            
-            
-            '''definition d'une Bbox autour d'une ligne definie par deux points :
-               first et child
-               on l'ajout a une variable self.bbox
-               on verifie si la ligne tracee, donc sa bbox, est dans une bbox
-               (in_bbox) return true if deds
-               existante autre que la sienne
-               si non : valid est True
-               si oui, re un test avec un line_intersection et chnagement de
-               valid en consequence
-            '''
+           
             break
 
         if self.ligne.valid is False:
@@ -176,7 +156,7 @@ class Ligne(Widget):
     '''Je n'ai pas trouver d'autre solution ( à toi de voir pour quelque chose de mieux    
 	je veux avoir la taille de la ligne afin de la diviser par deux à la fin.
     '''
-    tailleLigne = NumericProperty(0)
+    #tailleLigne = NumericProperty(0)
 
 class PointApp(App):
     def build(self):
