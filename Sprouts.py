@@ -49,6 +49,7 @@ class PointApp(App):
         layout.add_widget(btnQuit)
         #on attache = quand on clic, pouf c la méthode show_game qui se lance
         btnPlay.bind(on_press=self.show_game)
+        btnQuit.bind(on_press=self.show_quit)
         return layout
 
     def show_menu(self, *args):
@@ -106,14 +107,24 @@ class PointApp(App):
 
 ### QUIT ###
 
-    #def create_quit(self, *args):
-        #btn.bind(on_press=self.stop)
+   # def create_quit(self, *args):
+        #btn.bind(on_press=self.show_conf)
 
     #def show_quit(self, *args):
 
     #def hide_quit(self, *args):
 
-        #refaire un autre pour un message de confirmation
+### CONFIRMATION DU QUITTAGE ###
+
+    #def create_conf(self, *args):
+        #btnYes=Button(text='Yes')
+        #btnNo=Button(text='No')
+    
+    #def show_conf(self, *args):
+
+
+    #def hide_conf(self, *args):
+        #pass
 
 ### SETTINGS ###
 
