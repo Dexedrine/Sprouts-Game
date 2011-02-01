@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from kivy.uix.widget import Widget
 from kivy.properties import NumericProperty
 
