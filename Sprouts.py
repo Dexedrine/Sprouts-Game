@@ -107,10 +107,13 @@ class PointApp(App):
 ### QUIT ###
 
     #def create_quit(self, *args):
+        #btn.bind(on_press=self.stop)
 
     #def show_quit(self, *args):
 
     #def hide_quit(self, *args):
+
+        #refaire un autre pour un message de confirmation
 
 ### SETTINGS ###
 
