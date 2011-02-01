@@ -7,16 +7,15 @@
 #Tous les imports utiles et nécessaires pour le bon déroulement du programme
 
 from kivy.app import App
-from kivy.factory import Factory
 from kivy.lang import Builder
 from kivy.core.window import Window
 from kivy.uix.widget import Widget
-from kivy.uix.scatter import ScatterPlane
-from kivy.graphics import Color, Ellipse
-from random import random, randint
+from random import random
 from kivy.properties import ListProperty, BooleanProperty, NumericProperty, ObjectProperty
-from kivy.graphics.vertex_instructions import Line
 from kivy.vector import Vector
+from kivy.clock import Clock
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
 
 #DEBUT du code
 
@@ -161,6 +160,35 @@ class Ligne(Widget):
 class PointApp(App):
     def build(self):
         Builder.load_file('sprouts.kv', rulesonly=True)
+        #variable contenant le terrain de jeu (se referer à l'arbre)
+        self.rootGame = None
+        #creation du menu
+        self.rootMenu = self.create_menu()
+        #affichage du menu
+        self.show_menu()
+
+
+    def create_menu(self, *args):
+        layout = BoxLayout(orientation='vertical')
+        btnPlay = Button(text='Play')
+        btnScores = Button(text='Scores')
+        btnQuit = Button(text='Quit')
+        layout.add_widget(btnPlay)
+        layout.add_widget(btnScores)
+        layout.add_widget(btnQuit)
+        btnPlay.bind(on_press=self.show_game)
+        return layout
+
+    def show_menu(self, *args):
+        Window.add_widget(self.rootMenu)
+
+    def hide_menu(self, *args):
+        Window.remove_widget(self.rootMenu)
+
+
+    def create_game(self):
+        '''Terrain de jeu
+        '''
         # w, h = canvas.size(); 
         root = Widget()
         #root = ScatterPlane()
@@ -185,6 +213,22 @@ class PointApp(App):
         root.add_widget(Tracer())
         return root
 
+    def show_game(self, *args):
+        '''
+        Fonction qui affiche le jeu quand on l'appelera
+        - créer le jeu
+        - add le jeu
+        '''
+        self.rootGame = self.create_game()
+        #on ajoute le jeu crée a la fenetre Window
+        Window.add_widget(self.rootGame)
+        self.hide_menu()
+
+    def hide_game(self, *args):
+        '''
+        Fonction qui enleve le jeu
+        '''
+        Window.remove_widget(self.rootGame)
 
 if __name__ == '__main__':
     PointApp().run()
