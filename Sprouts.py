@@ -13,24 +13,17 @@ from kivy.uix.widget import Widget
 from random import random
 from kivy.properties import ListProperty, BooleanProperty, NumericProperty, ObjectProperty
 from kivy.vector import Vector
-from kivy.clock import Clock
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
-from kivy.gesture import GestureStroke
-from kivy.input.motionevent import MotionEvent
 from math import*
+
+
+#import de nos propores widgets depuis des fichiers "à part"
+#from <nomdurepertoire>.<nomdufichiersanspy> import <nomdelaclasse>
+
+from widgets.gamepoint import Point
 #DEBUT du code
 
-class Point(Widget):
-    '''Classe Point(), possède la propriété degré'''
-
-    def __init__(self, **kwargs):
-        '''Constructeur du noeud, il appelle son père widget'''
-
-        super(Point, self).__init__(**kwargs)
-
-    #Propriété degré, par défaut égal à 0 attribué a chaque création de point
-    degre = NumericProperty(0)
 
 
 class Tracer(Widget):
