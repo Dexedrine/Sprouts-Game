@@ -16,7 +16,9 @@ from kivy.vector import Vector
 from kivy.clock import Clock
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
-
+from kivy.gesture import GestureStroke
+from kivy.input.motionevent import MotionEvent
+from math import*
 #DEBUT du code
 
 class Point(Widget):
@@ -51,6 +53,7 @@ class Tracer(Widget):
         # -gère la detection d'un clic dans un point
         # -vérifie que le point n'est pas saturé en degré (degre<4)
         # -créer et attache la ligne à Tracer
+      
         '''
         root = self.parent
 
@@ -63,24 +66,29 @@ class Tracer(Widget):
                 continue
             print child, 'je suis touché, argh je me meurs trop sa mère'
             self.ligne = Ligne(points=[child.center_x, child.center_y], valid=True, first=child)
+            self.ligne.xprec = touch.x
+            self.ligne.yprec = touch.y
             self.add_widget(self.ligne)
             break
 
 
     def on_touch_move(self, touch):
         '''methode on_touch_move(): quand on move un event
-        si tout est ok dans on_touch_down(), on trace
-        calcul en live des x et y minimaux 
+        - si tout est ok dans on_touch_down(), on trace
+        - calcul en live des x et y minimaux / maximaux afin de tracer les bbox
+        - calcul de la longueur courante de la ligne     racine carrée de ((x2-x1) * (x2-x1) + ((y2-y1)*(y2-y1))
+        
         '''
-        #on doit faire que la ligne "commence" a partir du bord du cercle 
-        #pour cela on calcul la distance centre/point
-
+        #on creer la variable precedentTouch si il n'y a pas encore eu de tracer de ligne
         if self.ligne:
             # if ((touch.x, touch.y)-(child.center_x, child.center_y)) <=
             #hild.radius):
-
-
+            
             self.ligne.points = self.ligne.points + [touch.x, touch.y]
+            self.ligne.longueur = self.ligne.longueur + sqrt((touch.x - self.ligne.xprec) * (touch.x - self.ligne.xprec) + (touch.y - self.ligne.yprec) * (touch.y - self.ligne.yprec))
+            print 'longueur courante = ' ,self.ligne.longueur
+            self.ligne.xprec = touch.x
+	    self.ligne.yprec = touch.y
             if self.ligne.minx > touch.x:
                 self.ligne.minx = touch.x
             if self.ligne.miny > touch.y:
@@ -89,21 +97,20 @@ class Tracer(Widget):
                 self.ligne.maxx = touch.x
             if self.ligne.maxy < touch.y:
                 self.ligne.maxy = touch.y
-            print self.ligne.minx, 'minx'
-            print self.ligne.miny, 'miny'
-            print self.ligne.maxx, 'maxx'
-            print self.ligne.maxy, 'maxy'
-            #tailleLigne = tailleLigne + 1 # on rajoute une taille en plus du fait de la creation du nouveau point.
-       
+            
+          
+         
     def on_touch_up(self, touch):
         '''methode on_touch_up() = quand on up un event
         # -recupère tout ses freres, verifie isinstance()
         # -gère la detection de fin de ligne dans un point
         # -vérifie que le point de fin n'est pas saturé en degre (degre<4)
+        # -on verifie aussi que si le point est relié à lui meme , on teste si le degré est <3
         # -si tout est ok, on increment degre dans le point de départ(first) et celui
         # d'arrivée(x)...(dans first on stocke une instance de point())
         # sinon : on remove à partir de if ! isinstance() la ligne de tracer()
         '''
+        #self.ligne.longueur = stroke_length(self.ligne.points)
         root = self.parent
 
         if not self.ligne:
@@ -116,10 +123,11 @@ class Tracer(Widget):
                 continue
             if not child.collide_point(touch.x, touch.y):
                 continue
+            if self.ligne.first == child:
+            	if child.degre > 1:
+            		continue
             if child.degre > 2:
-                continue
-            #if self.ligne.first == child:
-                #continue
+               	continue
             print 'point arrivée'
             self.ligne.first.degre += 1
             child.degre += 1
@@ -131,8 +139,6 @@ class Tracer(Widget):
             	- on regarde la taille et on l'a divise par deux pour trouver le milieu de la ligne
             	- on place au coordonnée indiquer par le nombre obtenu le nouveau point (?) 
             '''
-            #position = self.ligne.tailleLigne / 2
-            ''' A COMPLETER , probleme de comprehension il est tard '''
            
             break
 
@@ -144,7 +150,6 @@ class Tracer(Widget):
 
 class Ligne(Widget):
     w, h = Window.size
-    #declaration d'une nouvelle proporiété
     points = ListProperty([])
     valid = BooleanProperty(True)
     first = ObjectProperty
@@ -152,10 +157,9 @@ class Ligne(Widget):
     miny = NumericProperty(h)
     maxx = NumericProperty(0)
     maxy = NumericProperty(0)
-    '''Je n'ai pas trouver d'autre solution ( à toi de voir pour quelque chose de mieux    
-	je veux avoir la taille de la ligne afin de la diviser par deux à la fin.
-    '''
-    #tailleLigne = NumericProperty(0)
+    xprec = NumericProperty(0)
+    yprec = NumericProperty(0)
+    longueur = NumericProperty(0)
 
 class PointApp(App):
     def build(self):
