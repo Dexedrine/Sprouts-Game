@@ -17,7 +17,7 @@ from random import random, randint
 from kivy.properties import ListProperty, BooleanProperty, NumericProperty, ObjectProperty
 from kivy.graphics.vertex_instructions import Line
 from kivy.vector import Vector
-
+from kivy.gesture import GestureStroke
 #DEBUT du code
 
 class Point(Widget):
@@ -71,7 +71,7 @@ class Tracer(Widget):
     def on_touch_move(self, touch):
         '''methode on_touch_move(): quand on move un event
         si tout est ok dans on_touch_down(), on trace
-        calcul en live des x et y minimaux 
+        calcul en live des x et y minimaux / maximaux afin de tracer les bbox
         '''
         #on doit faire que la ligne "commence" a partir du bord du cercle 
         #pour cela on calcul la distance centre/point
@@ -90,21 +90,18 @@ class Tracer(Widget):
                 self.ligne.maxx = touch.x
             if self.ligne.maxy < touch.y:
                 self.ligne.maxy = touch.y
-            print self.ligne.minx, 'minx'
-            print self.ligne.miny, 'miny'
-            print self.ligne.maxx, 'maxx'
-            print self.ligne.maxy, 'maxy'
-            #tailleLigne = tailleLigne + 1 # on rajoute une taille en plus du fait de la creation du nouveau point.
-       
+         
     def on_touch_up(self, touch):
         '''methode on_touch_up() = quand on up un event
         # -recupère tout ses freres, verifie isinstance()
         # -gère la detection de fin de ligne dans un point
         # -vérifie que le point de fin n'est pas saturé en degre (degre<4)
+        # -on verifie aussi que si le point est relié à lui meme , on teste si le degré est <3
         # -si tout est ok, on increment degre dans le point de départ(first) et celui
         # d'arrivée(x)...(dans first on stocke une instance de point())
         # sinon : on remove à partir de if ! isinstance() la ligne de tracer()
         '''
+        #self.ligne.longueur = stroke_length(self.ligne.points)
         root = self.parent
 
         if not self.ligne:
@@ -117,10 +114,11 @@ class Tracer(Widget):
                 continue
             if not child.collide_point(touch.x, touch.y):
                 continue
+            if self.ligne.first == child:
+            	if child.degre > 1:
+            		continue
             if child.degre > 2:
-                continue
-            #if self.ligne.first == child:
-                #continue
+               	continue
             print 'point arrivée'
             self.ligne.first.degre += 1
             child.degre += 1
@@ -132,8 +130,6 @@ class Tracer(Widget):
             	- on regarde la taille et on l'a divise par deux pour trouver le milieu de la ligne
             	- on place au coordonnée indiquer par le nombre obtenu le nouveau point (?) 
             '''
-            #position = self.ligne.tailleLigne / 2
-            ''' A COMPLETER , probleme de comprehension il est tard '''
            
             break
 
@@ -145,7 +141,6 @@ class Tracer(Widget):
 
 class Ligne(Widget):
     w, h = Window.size
-    #declaration d'une nouvelle proporiété
     points = ListProperty([])
     valid = BooleanProperty(True)
     first = ObjectProperty
@@ -153,10 +148,7 @@ class Ligne(Widget):
     miny = NumericProperty(h)
     maxx = NumericProperty(0)
     maxy = NumericProperty(0)
-    '''Je n'ai pas trouver d'autre solution ( à toi de voir pour quelque chose de mieux    
-	je veux avoir la taille de la ligne afin de la diviser par deux à la fin.
-    '''
-    #tailleLigne = NumericProperty(0)
+    longueur = NumericProperty(0)
 
 class PointApp(App):
     def build(self):
