@@ -8,6 +8,7 @@ class Ligne(Widget):
     points = ListProperty([])
     valid = BooleanProperty(True)
     first = ObjectProperty
+    pointPrecedent = ObjectProperty
     minx = NumericProperty(w)
     miny = NumericProperty(h)
     maxx = NumericProperty(0)
@@ -15,3 +16,4 @@ class Ligne(Widget):
     xprec = NumericProperty(0)
     yprec = NumericProperty(0)
     longueur = NumericProperty(0)
+    longueurtemp = NumericProperty(0)
