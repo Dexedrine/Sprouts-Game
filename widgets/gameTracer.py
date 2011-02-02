@@ -12,7 +12,7 @@ class Tracer(Widget):
     '''Classe Tracer() gère l'affichage des lignes graphiquement
     possède 3 méthodes : down(), move() et up()
     '''
-
+    longueurtemp  = NumericProperty(0)
     def __init__(self, **kwargs):
         '''Constructeur de la classe Tracer() + declaration d'une variable
            ligne qui par la suite prendra la création de ligne
@@ -110,10 +110,23 @@ class Tracer(Widget):
             print 'degre point :', child.degre 
             self.ligne.valid = True
             
+            
             ''' ICI on doit faire la creation du nouveau POINT ! 
             	- on regarde la taille et on l'a divise par deux pour trouver le milieu de la ligne
             	- on place au coordonnée indiquer par le nombre obtenu le nouveau point (?) 
             '''
+            pointPrecedent = None
+            for coordonnee in self.ligne.points:
+            	pointPrecedent = coordonnee
+            	
+            	break
+            for coordonnee in self.ligne.points:
+            	
+            	if coordonnee == pointPrecedent:
+            		continue
+            	if longueurtemp > self.ligne.longueur /2
+            		break
+            	self.longueurtemp = self.longueurtemp + sqrt((coordonnee[0] - pointPrecedent[0]) * (coordonnee[0] - pointPrecedent[0]) + (coordonnee[1] - pointPrecedent[1]) * (coordonnee[1] - pointPrecedent[1]))
            
             break
 
