@@ -34,10 +34,18 @@ class PointApp(App):
         self.rootMenu = self.create_menu()
         #affichage du menu
         self.show_menu()
-
+        #creation du quit
+        self.rootQuit = self.create_quit()
+       
 ### MENU ##
 
     def create_menu(self, *args):
+        '''
+        fonction qui crée le menu, le layout est un BoxLayout, avec une marge
+        de 100 et un espace de 5 entre chacun des boutons
+        Chacun des 4 boutons est ajouté au layout
+        cette fonction return un layout
+        '''
         layout = BoxLayout(orientation='vertical', padding=100, spacing =5)
         btnPlay = Button(text='Play')
         btnScores = Button(text='Scores')
@@ -47,26 +55,42 @@ class PointApp(App):
         layout.add_widget(btnScores)
         layout.add_widget(btnSettings)
         layout.add_widget(btnQuit)
-        #on attache = quand on clic, pouf c la méthode show_game qui se lance
+        #on attache = quand on clic, pouf c'est la méthode show_game qui se lance
         btnPlay.bind(on_press=self.show_game)
         btnQuit.bind(on_press=self.show_quit)
         return layout
 
     def show_menu(self, *args):
+        '''
+        fonction qui affiche le menu
+        on ajoute le widget rootMenu(qui contient le create_menu) a la fenetre pour qu'il soit visible
+        '''
         Window.add_widget(self.rootMenu)
 
     def hide_menu(self, *args):
+        '''
+        fonction qui retire le widget à la fenetre
+        '''
         Window.remove_widget(self.rootMenu)
 
 
 ### GAME ###
 
     def create_game(self):
-        '''Terrain de jeu
+        '''
+        fonction qui crée un terrain de jeu :
+            - apparition aléatoires des noeuds de début de jeu
+           '''
+        '''WARNING : penser a inserer le return a l'écran de menu via un double
+        clic sur l'écran
         '''
         # w, h = canvas.size(); 
         root = Widget()
         #root = ScatterPlane()
+        '''
+        ici on soustrait la taille du rond afin que l'affichage se fasse bien,
+        qu'aucun noeud ne soit couper par les bords de la fenetre
+        '''
         w = Window.width-50
         h = Window.height-50 
         #on ajoute la liste des positions des Point que l'on crées à la liste
@@ -83,6 +107,12 @@ class PointApp(App):
                     ok = False
                     break
             if ok :
+                '''
+                si la variable ok est true, cad si la distance entre deux points
+                est supérieur a deux fois le rayon, alors j'ajoute mon point a
+                ma liste de point et j'ajoute mon point a mon root pour qu'il
+                soit affiché a l'écran
+                '''
                 listPoint.append(point)
                 root.add_widget(point)
         root.add_widget(Tracer())
@@ -95,39 +125,48 @@ class PointApp(App):
         - add le jeu
         '''
         self.rootGame = self.create_game()
-        #on ajoute le jeu crée a la fenetre Window
+        #on ajoute le jeu crée a la fenetre Window pour qu'il apparaisse à
+        #l'écran
         Window.add_widget(self.rootGame)
+        #on cache le menu, sinon il y a superposition du menu et du terrain de
+        #jeu
         self.hide_menu()
 
     def hide_game(self, *args):
         '''
-        Fonction qui enleve le jeu
+        Fonction qui "cache" le jeu
         '''
         Window.remove_widget(self.rootGame)
 
 ### QUIT ###
 
-   # def create_quit(self, *args):
-        #btn.bind(on_press=self.show_conf)
+    def create_quit(self, *args):
+        '''
+        on crée deux boutons pour la confirmation : oui ou non
+        '''
+        layout = BoxLayout(orientation='vertical', padding=100, spacing=5)
+        self.btnYes=Button(text='Yes')
+        self.btnNo=Button(text='No')
+        layout.add_widget(self.btnYes)
+        layout.add_widget(self.btnNo)
+        return layout
+            
+    def show_quit(self, *args):
+        Window.add_widget(self.rootQuit)
+        self.btnYes.bind(on_press=self.stop)
+        self.btnNo.bind(on_press=self.hide_quit)
+        self.btnNo.bind(on_release=self.show_menu)
+        self.hide_menu()
 
-    #def show_quit(self, *args):
-
-    #def hide_quit(self, *args):
-
-### CONFIRMATION DU QUITTAGE ###
-
-    #def create_conf(self, *args):
-        #btnYes=Button(text='Yes')
-        #btnNo=Button(text='No')
-    
-    #def show_conf(self, *args):
-
-
-    #def hide_conf(self, *args):
-        #pass
+    def hide_quit(self, *args):
+        Window.remove_widget(self.rootQuit)
 
 ### SETTINGS ###
 
+    '''
+    Partie configuration selon l'user :
+         -Musique ON/OFF
+    '''
     #def create_settings(self, *args):
 
     #def show_settings(self, *args):
@@ -135,6 +174,11 @@ class PointApp(App):
     #def hide_settings(self, *args):
 
 ### SCORES ###
+
+    '''Partie scores :
+         -voir ses propres scores/niveau
+         -voir les scores des autres/niveau
+    '''
 
     #def create_scores(self, *args):
 

@@ -3,10 +3,6 @@ from kivy.properties import ListProperty, BooleanProperty, NumericProperty, Obje
 from kivy.core.window import Window
 from kivy.uix.widget import Widget
 
-
-
-
-
 class Ligne(Widget):
     w, h = Window.size
     points = ListProperty([])

@@ -4,10 +4,6 @@ from widgets.gamepoint import Point
 from math import sqrt
 from widgets.gameLigne import Ligne
 
-
-
-
-
 class Tracer(Widget):
     '''Classe Tracer() gère l'affichage des lignes graphiquement
     possède 3 méthodes : down(), move() et up()
@@ -20,7 +16,7 @@ class Tracer(Widget):
         super(Tracer, self).__init__(**kwargs)
         self.ligne = None
         self.bbox = [(), ()]
-
+        #self.nbCoups = 0
 
     def on_touch_down(self, touch):
         '''Methode on_touch_down() : quand on down un event
