@@ -20,3 +20,4 @@ class Ligne(Widget):
     xprec = NumericProperty(0)
     yprec = NumericProperty(0)
     longueur = NumericProperty(0)
+    longueurtemp = NumericProperty(0)

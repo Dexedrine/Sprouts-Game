@@ -12,7 +12,7 @@ class Tracer(Widget):
     '''Classe Tracer() gère l'affichage des lignes graphiquement
     possède 3 méthodes : down(), move() et up()
     '''
-    longueurtemp  = NumericProperty(0)
+    
     def __init__(self, **kwargs):
         '''Constructeur de la classe Tracer() + declaration d'une variable
            ligne qui par la suite prendra la création de ligne
@@ -124,9 +124,9 @@ class Tracer(Widget):
             	
             	if coordonnee == pointPrecedent:
             		continue
-            	if longueurtemp > self.ligne.longueur /2
+            	if self.ligne.longueurtemp > self.ligne.longueur / 2:
             		break
-            	self.longueurtemp = self.longueurtemp + sqrt((coordonnee[0] - pointPrecedent[0]) * (coordonnee[0] - pointPrecedent[0]) + (coordonnee[1] - pointPrecedent[1]) * (coordonnee[1] - pointPrecedent[1]))
+            	self.ligne.longueurtemp = self.ligne.longueurtemp + sqrt((coordonnee[0] - pointPrecedent[0]) * (coordonnee[0] - pointPrecedent[0]) + (coordonnee[1] - pointPrecedent[1]) * (coordonnee[1] - pointPrecedent[1]))
            
             break
 
