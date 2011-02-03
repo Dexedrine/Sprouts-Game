@@ -111,20 +111,27 @@ class Tracer(Widget):
             	- on regarde la taille et on l'a divise par deux pour trouver le milieu de la ligne
             	- on place au coordonnée indiquer par le nombre obtenu le nouveau point (?) 
             '''
-            pointPrecedent = None
-            for coordonnee in self.ligne.points:
-            	pointPrecedent = coordonnee
-            	
-            	break
-            for coordonnee in self.ligne.points:
-            	
-            	if coordonnee == pointPrecedent:
+      
+            precx = self.ligne.points[0]
+            precy = self.ligne.points[1]
+            cx = None # n*2
+            cy = None # n*2 +1
+            for i in range(len(self.ligne.points) / 2):
+            	cx = self.ligne.points[2*i]
+            	cy = self.ligne.points[2*i +1]
+            	if cx == precx or cx == precy :
             		continue
-            	if self.ligne.longueurtemp > self.ligne.longueur / 2:
+            	if self.ligne.milieu > self.ligne.longueur / 2:
+            		print 'le milieu trouvé est ' , self.ligne.milieu , ' avec une longueur initiale de : ' , self.ligne.longueur
             		break
-            	self.ligne.longueurtemp = self.ligne.longueurtemp + sqrt((coordonnee[0] - pointPrecedent[0]) * (coordonnee[0] - pointPrecedent[0]) + (coordonnee[1] - pointPrecedent[1]) * (coordonnee[1] - pointPrecedent[1]))
+             	self.ligne.milieu += sqrt((cx - precx) * (cx - precx) + (cy - precy) * (cy - precy))
+            	precx = cx
+            	precy = cy
+            pointMilieu = Point(size=(25, 25),
+                              pos =(precx, precy))
+          #      PointApp.listPoint.append(pointMilieu)
+            root.add_widget(pointMilieu)
            
-            break
 
         if self.ligne.valid is False:
             self.remove_widget(self.ligne)
