@@ -98,12 +98,12 @@ class PointApp(App):
         listPoint = []
 
         while len(listPoint) != 10 :
-            point = Point(size=(50, 50),
+            point = Point(size=(25, 25),
                           pos =(random()*w, random()*h))
             ok = True
             v = Vector(point.center)
             for p in listPoint:
-                if v.distance(p.center) <= 50:
+                if v.distance(p.center) <= 25:
                     ok = False
                     break
             if ok :
