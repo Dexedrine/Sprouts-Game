@@ -129,6 +129,7 @@ class Tracer(Widget):
             	precy = cy
             pointMilieu = Point(size=(25, 25),
                               pos =(precx, precy))
+            pointMilieu.degre = 2
           #      PointApp.listPoint.append(pointMilieu)
             root.add_widget(pointMilieu)
            
