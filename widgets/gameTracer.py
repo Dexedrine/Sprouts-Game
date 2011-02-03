@@ -52,9 +52,7 @@ class Tracer(Widget):
         '''
         #on creer la variable precedentTouch si il n'y a pas encore eu de tracer de ligne
         if self.ligne:
-            # if ((touch.x, touch.y)-(child.center_x, child.center_y)) <=
-            #hild.radius):
-            
+                      
             self.ligne.points = self.ligne.points + [touch.x, touch.y]
             self.ligne.longueur = self.ligne.longueur + sqrt((touch.x - self.ligne.xprec) * (touch.x - self.ligne.xprec) + (touch.y - self.ligne.yprec) * (touch.y - self.ligne.yprec))
             print 'longueur courante = ' ,self.ligne.longueur
@@ -81,7 +79,7 @@ class Tracer(Widget):
         # d'arrivée(x)...(dans first on stocke une instance de point())
         # sinon : on remove à partir de if ! isinstance() la ligne de tracer()
         '''
-        #self.ligne.longueur = stroke_length(self.ligne.points)
+        
         root = self.parent
 
         if not self.ligne:
