@@ -88,7 +88,7 @@ class Tracer(Widget):
         # -recupère tout ses freres, verifie isinstance()
         # -gère la detection de fin de ligne dans un point
         # -vérifie que le point de fin n'est pas saturé en degre (degre<4)
-        # -on verifie aussi que si le point est relié à lui meme , on teste si le degré est <3
+        # -on verifie aussi que si le point est relié à lui meme , on teste si le degré est <3 ET on verif si on est sorti du point au moins une fois !
         # -si tout est ok, on increment degre dans le point de départ(first) et celui
         # d'arrivée(x)...(dans first on stocke une instance de point())
         # sinon : on remove à partir de if ! isinstance() la ligne de tracer()
@@ -107,6 +107,8 @@ class Tracer(Widget):
             if not child.collide_point(touch.x, touch.y):
                 continue
             if self.ligne.first == child:
+            	if self.ligne.longueur < 2*3.14*12.25:  #perimetre d'un point ! 
+            	    continue
                 if child.degre > 1:
                     continue
             if child.degre > 2:

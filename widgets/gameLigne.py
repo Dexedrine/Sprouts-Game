@@ -17,3 +17,4 @@ class Ligne(Widget):
     yprec = NumericProperty(0)
     longueur = NumericProperty(0)
     milieu = NumericProperty(0)
+    sortiDuPoint = BooleanProperty(False)
