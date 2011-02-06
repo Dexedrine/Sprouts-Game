@@ -124,39 +124,41 @@ class Tracer(Widget):
 
             #inclure le test de la Bbox ICI
 
-            l1 = self.ligne
-            for l2 in self.children: #je recupere ttes mes lignes
-                if l1 is l2: continue
-                if self.is_intersect(l1.points, l2.points):
-                    print 'intersection entre' ,l1,l2
-                    self.ligne.valid = False
+        l1 = self.ligne
+        for l2 in self.children: #je recupere ttes mes lignes
+            if l1 is l2: continue
+            if self.is_intersect(l1.points, l2.points):
+                print 'intersection entre' ,l1,l2
+                self.ligne.valid = False
                                    
 
             ''' ICI on doit faire la creation du nouveau POINT ! 
             - on regarde la taille et on l'a divise par deux pour trouver le milieu de la ligne
             - on place au coordonnée indiquer par le nombre obtenu le nouveau point (?) 
             '''
-            if self.ligne.valid is True: 
-                precx = self.ligne.points[0]
-                precy = self.ligne.points[1]
-                cx = None # n*2
-                cy = None # n*2 +1
-                for i in range(len(self.ligne.points) / 2):
-                    cx = self.ligne.points[2*i]
-                    cy = self.ligne.points[2*i +1]
-                    if cx == precx or cx == precy :
-                        continue
-                    if self.ligne.milieu > self.ligne.longueur / 2:
-                        print 'le milieu trouvé est ' , self.ligne.milieu , ' avec une longueur initiale de : ' , self.ligne.longueur
-                        break
-                    self.ligne.milieu += sqrt((cx - precx) * (cx - precx)
-                                          + (cy - precy) * (cy - precy))
-                    precx = cx
-                    precy = cy
-                pointMilieu = Point(size=(25, 25),
-                                    pos =(precx, precy))
-                #      PointApp.listPoint.append(pointMilieu)
-                root.add_widget(pointMilieu)
+
+        if self.ligne.valid is True:    
+            precx = self.ligne.points[0]
+            precy = self.ligne.points[1]
+            cx = None # n*2
+            cy = None # n*2 +1
+            for i in range(len(self.ligne.points) / 2):
+            	cx = self.ligne.points[2*i]
+            	cy = self.ligne.points[2*i +1]
+            	if cx == precx or cx == precy :
+            		continue
+            	if self.ligne.milieu > self.ligne.longueur / 2:
+            		print 'le milieu trouvé est ' , self.ligne.milieu , ' avec une longueur initiale de : ' , self.ligne.longueur
+            		break
+             	self.ligne.milieu += sqrt((cx - precx) * (cx - precx) + (cy - precy) * (cy - precy))
+            	precx = cx
+            	precy = cy
+            pointMilieu = Point(size=(25, 25),
+                              pos =(precx, precy))
+            pointMilieu.degre = 2
+          #      PointApp.listPoint.append(pointMilieu)
+            root.add_widget(pointMilieu)
+           
 
 
         if self.ligne.valid is False:
