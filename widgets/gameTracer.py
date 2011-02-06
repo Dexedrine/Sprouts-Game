@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from kivy.uix.widget import Widget
 from widgets.gamepoint import Point
-from math import sqrt
+from math import sqrt, pi
 from widgets.gameLigne import Ligne
-from kivy.vector import Vector
 
 
 
@@ -14,10 +13,6 @@ def ccw(A,B,C):
 
 def intersect(A,B,C,D):
         return ccw(A,C,D) != ccw(B,C,D) and ccw(A,B,C) != ccw(A,B,D)
-
-
-
-
 
 
 class Tracer(Widget):
@@ -107,7 +102,7 @@ class Tracer(Widget):
             if not child.collide_point(touch.x, touch.y):
                 continue
             if self.ligne.first == child:
-            	if self.ligne.longueur < 2*3.14*12.25:  #perimetre d'un point ! 
+            	if self.ligne.longueur < 2*pi*12.25:  #perimetre d'un point ! 
             	    continue
                 if child.degre > 1:
                     continue
@@ -125,7 +120,8 @@ class Tracer(Widget):
             '''
 
             #inclure le test de la Bbox ICI
-
+        '''on applique ici la fonction is_intersect() qui determine si il y a
+        oui ou non intersection de la ligne tracée avec une autre du plateau'''
         l1 = self.ligne
         for l2 in self.children: #je recupere ttes mes lignes
             if l1 is l2: continue
@@ -135,8 +131,8 @@ class Tracer(Widget):
                                    
 
             ''' ICI on doit faire la creation du nouveau POINT ! 
-            - on regarde la taille et on l'a divise par deux pour trouver le milieu de la ligne
-            - on place au coordonnée indiquer par le nombre obtenu le nouveau point (?) 
+            - on regarde la taille de la ligne  et on la divise par deux pour trouver le milieu de la ligne
+            - on place aux coordonnées indiquées par le nombre obtenu le nouveau point (?) 
             '''
 
         if self.ligne.valid is True:    
@@ -162,7 +158,7 @@ class Tracer(Widget):
             root.add_widget(pointMilieu)
            
 
-
+        #quand la ligne est invalidée on la remove de la fenetre
         if self.ligne.valid is False:
             self.remove_widget(self.ligne)
 
@@ -173,15 +169,22 @@ class Tracer(Widget):
 
     def is_intersect(self, l1, l2):#on passe deux ensembles de points = ligne
         for i in xrange(0, len(l1)-4, 2):
+            '''on recupère le point precedent(xp et yp) et le point current de la première
+            ligne(xc et yc)'''
             xp = l1[i]
             yp = l1[i+1]
             xc = l1[i+2]
             yc = l1[i+3]
             for j in xrange(0, len(l2)-4, 2):
+                ''' on recupere le point precedent (xpb et ypb) et le point current de la
+                seconde ligne (xcb et ycb)'''
                 xpb = l2[j]
                 ypb = l2[j+1]
                 xcb = l2[j+2]
                 ycb = l2[j+3]
+                '''on utilise la fonction definie en debut de programme, elle a
+                été trouvé sur le net, elle ne retourne pas la position du
+                croisement'''
                 if intersect((xp, yp), (xc, yc),(xpb, ypb), (xcb, ycb)):
                     return True
 
