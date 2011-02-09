@@ -44,6 +44,20 @@ Pseudo code de l'effacement de point dans le rond
 
 
 
+	    coordonneeX , coordonneeY = self.ligne.first.pos
+	    print 'pos coorX = ' , coordonneeX , 'pos coorY', coordonneeY
+	    for point in range(len(self.ligne.points) / 2):
+            	coorPointX = self.ligne.points[i *2]
+		coorPointY = self.ligne.points[i*2 +1]
+		if coorPointX < coordonneeX +25 and coorPointX > coordonneeX-25 and coorPointY < coordonneeY +25 and coorPointY > coordonneeY-25:
+			print ' on a supprimer les points !! '
+			self.ligne.points.remove(coorPointX) # suppr x
+			self.ligne.points.remove(coorPointY) # suppr y
+			
+	    print 'fin de l algo foireux' 
+           
+
+
 Durant la premier semaine nous avons decomposer le jeu en le separant  methodiquement en sous probleme 
 Nous avons tout d'abord debattu sur le choix du langage , on a peser le pour et le contre au niveau du java ensuite on a debattu sur l'idée d'utiliser un langage dont on ne connaissait que tres peu mais qui était non seulement simple et concis. 
 

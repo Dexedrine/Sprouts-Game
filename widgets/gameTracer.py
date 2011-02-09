@@ -94,7 +94,8 @@ class Tracer(Widget):
         if not self.ligne:
             return
 
-        self.ligne.valid = True
+        self.ligne.valid = False
+        self.ligne.valid2 = True
 
         for child in root.children:
             if not isinstance(child, Point):
@@ -116,17 +117,14 @@ class Tracer(Widget):
 		coorPointY = self.ligne.points[point*2 +1]
 		for child in root.children:
            		if not isinstance(child, Point):
-           			print 'not instance'
                 		continue
                 	if child == self.ligne.first or child == self.ligne.last:
-                		print 'depart ou arrivé'
                 		continue
                 	coordonneeX , coordonneeY = child.pos
-                	print 'x= ' , coordonneeX , ' y=' , coordonneeY
                 	if coorPointX < coordonneeX +25 and coorPointX > coordonneeX-25 and coorPointY < coordonneeY +25 and coorPointY > coordonneeY-25:	
-                		self.ligne.valid = False
+                		self.ligne.valid2 = False
                 		break
-            if self.ligne.valid == False:
+            if self.ligne.valid2 == False:
             	print 'on a mis a false car passage a travers un point  !!! '
             	continue
             print 'point arrivée'
@@ -177,19 +175,10 @@ class Tracer(Widget):
             pointMilieu.degre = 2
                  #      PointApp.listPoint.append(pointMilieu)
             root.add_widget(pointMilieu)
-	    """ debut algo foireux ! """
-	    """
-	    coordonneeX , coordonneeY = self.ligne.first.pos
-	    for point in range(len(self.ligne.points)):
-            	coorPointX = self.ligne.points[i *2]
-		coorPointY = self.ligne.points[i*2 +1]
-		if coorPointX < coordonneeX and coorPointY < coordonneeY:
-			self.ligne.points.remove(i*2) # suppr x
-			self.ligne.points.remove(i*2) # suppr y
-			"""
-	    """ fin de l'algo foireux """
-           
-
+	    
+	    
+	    print 'debut algo foireux !'
+	   
         #quand la ligne est invalidée on la remove de la fenetre
         if self.ligne.valid is False:
             self.remove_widget(self.ligne)
