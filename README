@@ -3,7 +3,7 @@ Programming in Python and Kivy.
 
 To launch : 
 install python : sudo apt-get install python
-install kivy : soon !
+install kivy : http://kivy.org/docs/guide/installation.html
 
 run python main.py
 

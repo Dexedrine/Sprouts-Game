@@ -154,8 +154,9 @@ class Tracer(Widget):
             pointMilieu = Point(size=(25, 25),
                               pos =(precx, precy))
             pointMilieu.degre = 2
-          #      PointApp.listPoint.append(pointMilieu)
+                 #      PointApp.listPoint.append(pointMilieu)
             root.add_widget(pointMilieu)
+
            
 
         #quand la ligne est invalidée on la remove de la fenetre
