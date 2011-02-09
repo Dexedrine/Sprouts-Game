@@ -46,7 +46,7 @@ class Tracer(Widget):
                 continue
             if child.degre > 2:
                 continue
-            print child, 'je suis touché, argh je me meurs trop sa mère'
+            print child, 'je suis touché, argh je me meurs'
             self.ligne = Ligne(points=[child.center_x, child.center_y], valid=True, first=child)
             self.ligne.xprec = touch.x
             self.ligne.yprec = touch.y
