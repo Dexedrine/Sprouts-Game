@@ -94,13 +94,14 @@ class Tracer(Widget):
         if not self.ligne:
             return
 
-        self.ligne.valid = False
+        self.ligne.valid = True
 
         for child in root.children:
             if not isinstance(child, Point):
                 continue
             if not child.collide_point(touch.x, touch.y):
                 continue
+            self.ligne.last = child
             if self.ligne.first == child:
             	if self.ligne.longueur < 2*pi*12.25:  #perimetre d'un point ! 
             	    continue
@@ -108,6 +109,26 @@ class Tracer(Widget):
                     continue
             if child.degre > 2:
                 continue
+            #on regarde si la ligne n'a pas traversée de point durant le tracer: 
+            root = self.parent
+            for point in range(len(self.ligne.points) / 2):
+		coorPointX = self.ligne.points[point *2]
+		coorPointY = self.ligne.points[point*2 +1]
+		for child in root.children:
+           		if not isinstance(child, Point):
+           			print 'not instance'
+                		continue
+                	if child == self.ligne.first or child == self.ligne.last:
+                		print 'depart ou arrivé'
+                		continue
+                	coordonneeX , coordonneeY = child.pos
+                	print 'x= ' , coordonneeX , ' y=' , coordonneeY
+                	if coorPointX < coordonneeX +25 and coorPointX > coordonneeX-25 and coorPointY < coordonneeY +25 and coorPointY > coordonneeY-25:	
+                		self.ligne.valid = False
+                		break
+            if self.ligne.valid == False:
+            	print 'on a mis a false car passage a travers un point  !!! '
+            	continue
             print 'point arrivée'
             self.ligne.first.degre += 1
             child.degre += 1
@@ -154,8 +175,19 @@ class Tracer(Widget):
             pointMilieu = Point(size=(25, 25),
                               pos =(precx, precy))
             pointMilieu.degre = 2
-          #      PointApp.listPoint.append(pointMilieu)
+                 #      PointApp.listPoint.append(pointMilieu)
             root.add_widget(pointMilieu)
+	    """ debut algo foireux ! """
+	    """
+	    coordonneeX , coordonneeY = self.ligne.first.pos
+	    for point in range(len(self.ligne.points)):
+            	coorPointX = self.ligne.points[i *2]
+		coorPointY = self.ligne.points[i*2 +1]
+		if coorPointX < coordonneeX and coorPointY < coordonneeY:
+			self.ligne.points.remove(i*2) # suppr x
+			self.ligne.points.remove(i*2) # suppr y
+			"""
+	    """ fin de l'algo foireux """
            
 
         #quand la ligne est invalidée on la remove de la fenetre
