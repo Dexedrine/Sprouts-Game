@@ -14,6 +14,8 @@ from random import random
 from kivy.vector import Vector
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
+from kivy.uix.slider import Slider
+
 
 #import de nos propres widgets depuis des fichiers "à part"
 #from <nomdurepertoire>.<nomdufichiersanspy> import <nomdelaclasse>
@@ -21,6 +23,15 @@ from kivy.uix.button import Button
 from widgets.gamepoint import Point
 from widgets.gameTracer import Tracer
 from widgets.gameLigne import Ligne
+
+'''déclaration du cpt qui comptabilise le nombre de coups jouer pendant la
+partie. Déclaré en debut comme ça accessible partout sans avoir besoin de mettre
+self.
+
+cpt = n 
+
+avec n le nombre de noeuds presents en début de partie. Ce n est
+determiné avant le debut de partie par le joueur'''
 
 
 #DEBUT du SproutsGame
@@ -36,6 +47,7 @@ class PointApp(App):
         self.show_menu()
         #creation du quit
         self.rootQuit = self.create_quit()
+        self.rootSelect = self.create_select()
        
 ### MENU ##
 
@@ -56,7 +68,7 @@ class PointApp(App):
         layout.add_widget(btnSettings)
         layout.add_widget(btnQuit)
         #on attache = quand on clic, pouf c'est la méthode show_game qui se lance
-        btnPlay.bind(on_press=self.show_game)
+        btnPlay.bind(on_press=self.show_select)
         btnQuit.bind(on_press=self.show_quit)
         return layout
 
@@ -74,6 +86,53 @@ class PointApp(App):
         Window.remove_widget(self.rootMenu)
 
 
+#### Select n : nbre de noeuds présents en début de partie ####
+
+    def create_select(self):
+        '''
+        Fonction qui crée un écran intermédiaire entre le menu et le jeu avant
+        de permettre au joueur de choisir le nombre de noeuds de départ que
+        comportera son plateau de jeu
+        Cette selection se fera a l'aide d'un slider !
+        '''
+        #creation d'un slider :
+        self.slid = Slider(orientation='horizontal', min=0, max=10, value=3)
+        layout = BoxLayout(orientation='vertical', padding=100, spacing=5)
+        self.btnOk = Button(text='Ok')
+        self.btnDel = Button(text='Retour')
+        layout.add_widget(self.slid)
+        layout.add_widget(self.btnOk)
+        layout.add_widget(self.btnDel)
+        self.nb = self.slid.value
+        return layout
+
+    def show_select(self, *args):
+        '''
+        fonction qui affiche l'écran de selection du nbre de noeuds
+        '''
+        Window.add_widget(self.rootSelect)
+        self.hide_menu()
+        self.btnOk.bind(on_press=self.toto)
+        self.btnDel.bind(on_press=self.hide_select)
+        self.slid.bind(on_press=self.toto)
+        print 'valeur par default', self.nb
+        
+    def hide_select(self, *args):
+        '''
+        fonction qui "hide" cet écran de selection
+        '''
+        Window.remove_widget(self.rootSelect)
+
+    def toto(self, *args):
+        self.nbDep = round(self.slid.value)
+        print 'valeur selectionnée', self.nbDep
+        self.btnOk.bind(on_press=self.hide_select)
+        self.btnOk.bind(on_press=self.show_game)
+        self.btnDel.bind(on_press=self.show_menu)
+
+
+
+
 ### GAME ###
 
     def create_game(self):
@@ -84,6 +143,7 @@ class PointApp(App):
         '''WARNING : penser a inserer le return a l'écran de menu via un double
         clic sur l'écran
         '''
+        print 'createeeeeeeeeeeeeeee'
         # w, h = canvas.size(); 
         root = Widget()
         #root = ScatterPlane()
@@ -97,7 +157,9 @@ class PointApp(App):
         #root
         listPoint = []
 
-        while len(listPoint) != 10 :
+        #inclure n : nbre de noeuds
+
+        while len(listPoint) != self.nbDep :
             point = Point(size=(25, 25),
                           pos =(random()*w, random()*h))
             ok = True
