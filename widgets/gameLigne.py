@@ -7,7 +7,9 @@ class Ligne(Widget):
     w, h = Window.size
     points = ListProperty([])
     valid = BooleanProperty(True)
+    valid2 = BooleanProperty(True)
     first = ObjectProperty
+    last = ObjectProperty
     pointPrecedent = ObjectProperty
     minx = NumericProperty(w)
     miny = NumericProperty(h)

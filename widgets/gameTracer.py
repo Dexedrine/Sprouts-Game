@@ -42,8 +42,10 @@ class Tracer(Widget):
         for child in root.children:
             if not isinstance(child, Point):
                 continue
+            
             if not child.collide_point(touch.x, touch.y):
                 continue
+            print child.degre
             if child.degre > 2:
                 continue
             print child, 'je suis touché, argh je me meurs'
@@ -88,26 +90,43 @@ class Tracer(Widget):
         # d'arrivée(x)...(dans first on stocke une instance de point())
         # sinon : on remove à partir de if ! isinstance() la ligne de tracer()
         '''
-
+	
         root = self.parent
-
-        if not self.ligne:
+	if not self.ligne:
             return
 
         self.ligne.valid = False
+        self.ligne.valid2 = True
 
         for child in root.children:
             if not isinstance(child, Point):
                 continue
             if not child.collide_point(touch.x, touch.y):
                 continue
+            self.ligne.last = child
             if self.ligne.first == child:
             	if self.ligne.longueur < 2*pi*12.25:  #perimetre d'un point ! 
             	    continue
                 if child.degre > 1:
+                    print ' trop de branche'
                     continue
             if child.degre > 2:
+                print ' trop de branche'
                 continue
+            #on regarde si la ligne n'a pas traversée de point durant le tracer: 
+            root2 = self.parent
+            for point in range(len(self.ligne.points) / 2):
+		coorPointX = self.ligne.points[point *2]
+		coorPointY = self.ligne.points[point*2 +1]
+		for child2 in root2.children:
+           		if not isinstance(child, Point):
+                		continue
+                	if child2 == self.ligne.first or child2 == self.ligne.last:
+                		continue
+                	coordonneeX , coordonneeY = child2.pos
+                	if coorPointX < coordonneeX +12.5 and coorPointX > coordonneeX-12.5 and coorPointY < coordonneeY +12.5 and coorPointY > coordonneeY-12.5:	
+                		self.ligne.valid2 = False
+                		continue
             print 'point arrivée'
             self.ligne.first.degre += 1
             child.degre += 1
@@ -156,11 +175,19 @@ class Tracer(Widget):
             pointMilieu.degre = 2
                  #      PointApp.listPoint.append(pointMilieu)
             root.add_widget(pointMilieu)
+<<<<<<< HEAD
 
            
 
         #quand la ligne est invalidée on la remove de la fenetre
         if self.ligne.valid is False:
+=======
+	    
+	    
+	    print 'debut algo foireux !'
+       #quand la ligne est invalidée on la remove de la fenetre
+        if self.ligne.valid is False or self.ligne.valid2 is False:
+>>>>>>> 181a8c5f634014e19525639a694398befab4b2ba
             self.remove_widget(self.ligne)
 
         #remise à None : pour recommencer une ligne de "zero"
