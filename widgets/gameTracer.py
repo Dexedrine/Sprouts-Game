@@ -175,19 +175,13 @@ class Tracer(Widget):
             pointMilieu.degre = 2
                  #      PointApp.listPoint.append(pointMilieu)
             root.add_widget(pointMilieu)
-<<<<<<< HEAD
 
-           
-
-        #quand la ligne est invalidée on la remove de la fenetre
-        if self.ligne.valid is False:
-=======
 	    
 	    
 	    print 'debut algo foireux !'
        #quand la ligne est invalidée on la remove de la fenetre
         if self.ligne.valid is False or self.ligne.valid2 is False:
->>>>>>> 181a8c5f634014e19525639a694398befab4b2ba
+
             self.remove_widget(self.ligne)
 
         #remise à None : pour recommencer une ligne de "zero"
