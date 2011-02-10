@@ -113,7 +113,9 @@ class Tracer(Widget):
             if child.degre > 2:
                 print ' trop de branche'
                 continue
-            #on regarde si la ligne n'a pas traversée de point durant le tracer: 
+            '''on regarde si la ligne n'a pas traversée de point durant le tracer:
+ 		bug.           
+             '''
             root2 = self.parent
             for point in range(len(self.ligne.points) / 2):
 		coorPointX = self.ligne.points[point *2]
@@ -127,12 +129,13 @@ class Tracer(Widget):
                 	if coorPointX < coordonneeX +12.5 and coorPointX > coordonneeX-12.5 and coorPointY < coordonneeY +12.5 and coorPointY > coordonneeY-12.5:	
                 		self.ligne.valid2 = False
                 		continue
-            print 'point arrivée'
-            self.ligne.first.degre += 1
-            child.degre += 1
-            print 'degre first' , self.ligne.first.degre
-            print 'degre point :', child.degre 
-            self.ligne.valid = True
+            if self.ligne.valid2 is True:
+            	print 'point arrivée'
+            	self.ligne.first.degre += 1
+            	child.degre += 1
+            	print 'degre first' , self.ligne.first.degre
+            	print 'degre point :', child.degre 
+            	self.ligne.valid = True
 
 
             ''' Test de l'intersection entre deux ensembles de points
@@ -154,7 +157,7 @@ class Tracer(Widget):
             - on place aux coordonnées indiquées par le nombre obtenu le nouveau point (?) 
             '''
 
-        if self.ligne.valid is True:    
+        if self.ligne.valid is True and self.ligne.valid2 is True:    
             precx = self.ligne.points[0]
             precy = self.ligne.points[1]
             cx = None # n*2
