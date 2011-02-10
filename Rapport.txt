@@ -1,0 +1,31 @@
+Rapport d'activité du projet Sprouts-Game
+
+Grâce a nos expériences personnelles (projet guerre des robot au S2 et projet personnel), nous avons appris à ne pas nous jeter tête baisser dans un projet. C'est pour cela que nous avons consacré la première semaine à l'étude et à la décomposition du jeu des pousses.
+Avec ce projet, nous avons eu la possibilité d'apprendre un nouveau langage : Python et de mettre à profit les enseignements des derniers cours de S3 à savoir l'utilisation d'un framework, dans notre cas Kivy. Ce dernier est un framework permettant d'utiliser la souris, le multitouch et de mettre les programmes réalisés sur mobile (Android). Outre l'opportunité d'apprendre un lange en autodidacte, nous y avons vu la possibilité de nous démarquer par rapport aux autres binôme qui restent assez conventionnels en utilisant Java.
+
+Afin d'avancer au mieux, nous avons décider de nous répartir les tâches, par exemple Nat s'est occupé du calcul des lignes alors que Lucie s'est occupé de leur croisement et ainsi de suite. Pour facilité cette méthode de travail nous avons utliser le site de dépôt gitHub (https://github.com/Dexedrine/Sprouts-Game).
+
+Avant de débuter chaque séance nous avons essayer de définir un cahier des charges pour les séances à venir et si l'on retrace nos activites on peut en ressortir ceci :
+création des classes Point (comporte les points), Ligne, Tracer( comporte les méthodes down, move, up, croisemtns de ligne, calcul du centre, positionnement au centre de la ligne), Sprouts( methodes pour l'affichage graphique, création aléatoire des points au début du jeu)
+
+' ' ' 
+- Création d'un certain nombre de point à des positions aléatoires
+ - La ligne tracée par l'utilisateur est faite sous forme d'un ensemble de points
+ - Tracer la ligne si et seulement si l'utilisateur relie deux points DISTINCT S, si le noeud a encore la possibilité d'accepter des dégres 
+ - creation des bounding Box autour des lignes afin de les utiliser pour une optimisation ( recherche des xmax/min et ymax/min ) 
+ - gerer la creation du nouveau point en s'appuyant sur la distance moyenne 
+ - Gerer le croisement de ligne 
+ - creation du menu 
+creation du choix nombre de points au debut via un slider' ' ' 
+
+
+Nous avons aussi défini le reste du travail à effectuer :
+
+-determiner la fin de la partie(inclure un timer, methodes des polygones a definir)
+-gerer les scores
+-IA
+-partie reseau à faire
+-optimisation du jeu avec inclusion des bbox
+-settings
+
+
