@@ -28,10 +28,9 @@ from widgets.gameLigne import Ligne
 partie. Déclaré en debut comme ça accessible partout sans avoir besoin de mettre
 self.
 
-cpt = n 
+cpt =  0
 
-avec n le nombre de noeuds presents en début de partie. Ce n est
-determiné avant le debut de partie par le joueur'''
+'''
 
 
 #DEBUT du SproutsGame
@@ -247,6 +246,34 @@ class PointApp(App):
     #def show_scores(self, *args):
 
     #def hide_scores(self, *args):
+
+
+'''Ci dessous la fonction qui determine la fin de partie en calculant le nombre
+de tours jouer. Cette fonction sera a inclure au bon endroit (dans la partie
+reseau) au même moment que la verification de la validité d'une ligne mais
+seulement quand le minimum de coups joués est atteint pour diminuer le nombre de
+vérifications au cours de l'éxécution
+
+if cpt >= 2*self.nbDep and < 3*self.nbDep-1 :
+    end_game()
+
+if cpt = 3*self.nbDep-1:
+    print 'Fin de la partie'
+    delay
+    Afficher les scores
+    retour menu
+
+    def end_game(self):
+        algo des polygones
+        essayer de detecter les points presents à l'interieur d'un polygome
+        tracés avec des lignes reliants les noeuds placés
+        si un noeud ne peut pas en rejoindre un autre et possede degre<3 mais
+        entouré de noeud avec degre=3 alors
+        on ne peut pas l'atteindre
+     '''   
+
+    
+
 
 if __name__ == '__main__':
     PointApp().run()
