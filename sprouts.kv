@@ -1,12 +1,12 @@
 #:kivy 1.0
-#Fichier de règle de reoresentation graphique :
+#Fichier de règle de representation graphique :
 #couleur, forme, taille, etc.
 
 <Point>:
 #Toujours éxécuté dans le constructeur, c'est l'équivalent du with...(que pour canvas)
     canvas:
         Color:
-            rgb: (1, 0, 1)
+            rgb: [(.81, .25, .83), (.83, .19, .74), (.83, .12, .44), (.83, .12, .12)][self.degre]
         Ellipse:
          #A gauche, ce qui appartient a l'objet
             pos: self.pos
