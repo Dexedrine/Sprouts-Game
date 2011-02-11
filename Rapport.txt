@@ -21,11 +21,11 @@ creation du choix nombre de points au debut via un slider' ' '
 
 Nous avons aussi défini le reste du travail à effectuer :
 
+
 -determiner la fin de la partie(inclure un timer, methodes des polygones a definir)
 -gerer les scores
 -IA
 -partie reseau à faire
 -optimisation du jeu avec inclusion des bbox
 -settings
-
 
