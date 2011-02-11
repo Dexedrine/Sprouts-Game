@@ -14,6 +14,7 @@ def ccw(A,B,C):
 def intersect(A,B,C,D):
         return ccw(A,C,D) != ccw(B,C,D) and ccw(A,B,C) != ccw(A,B,D)
 
+###DEBUT###
 
 class Tracer(Widget):
     '''Classe Tracer() gère l'affichage des lignes graphiquement
