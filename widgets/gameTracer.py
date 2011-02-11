@@ -120,20 +120,19 @@ class Tracer(Widget):
     def validation_Traversee(self, ligne):
         #fonction qui permet de voir si la ligne tracée n'a pas traversée de point
         root = self.parent
-    for point in range(len(ligne.points) / 2):
-        coorPointX = ligne.points[point *2]
-        coorPointY = ligne.points[point*2 +1]
-        for child in root.children:
-                   if not isinstance(child, Point):
-                        continue
-                    if child == ligne.first or child == ligne.last:
-                        continue
-                    coordonneeX , coordonneeY = child.pos
-                    if coorPointX < coordonneeX +25 and coorPointX > coordonneeX-25 and coorPointY < coordonneeY +25 and coorPointY > coordonneeY-25:    
-                        self.ligne.valid2 = False
-                        continue
-           
-    return self.ligne.valid2
+        for point in range(len(ligne.points) / 2):
+            coorPointX = ligne.points[point *2]
+            coorPointY = ligne.points[point*2 +1]
+            for child in root.children:
+                if not isinstance(child, Point):
+                    continue
+                if child == ligne.first or child == ligne.last:
+                    continue
+                coordonneeX , coordonneeY = child.pos
+                if coorPointX < coordonneeX +25 and coorPointX > coordonneeX-25 and coorPointY < coordonneeY +25 and coorPointY > coordonneeY-25:    
+                    self.ligne.valid2 = False
+                    continue
+        return self.ligne.valid2
 
 
     def test_Intersection_Ligne(self, l1):
@@ -155,20 +154,19 @@ class Tracer(Widget):
         cx = None # n*2
         cy = None # n*2 +1
         for i in range(len(ligne.points) / 2):
-
-        	cx = ligne.points[2*i]
-            	cy = ligne.points[2*i +1]
-            	if cx == precx or cx == precy :
-            		continue
-            	if ligne.milieu > ligne.longueur / 2:
-            		print 'le milieu trouvé est ' , ligne.milieu , ' avec une longueur initiale de : ' , ligne.longueur
-            		break
-             	ligne.milieu += sqrt((cx - precx) * (cx - precx) + (cy - precy) * (cy - precy))
-            	precx = cx
-            	precy = cy
+            cx = ligne.points[2*i]
+            cy = ligne.points[2*i +1]
+            if cx == precx or cx == precy :
+                continue
+            if ligne.milieu > ligne.longueur / 2:
+                print 'le milieu trouvé est ' , ligne.milieu , ' avec une longueur initiale de : ' , ligne.longueur
+                break
+            ligne.milieu += sqrt((cx - precx) * (cx - precx) + (cy - precy) * (cy - precy))
+            precx = cx
+            precy = cy
 
         pointMilieu = Point(size=(25, 25),
-                    pos =(precx, precy))
+                            pos =(precx, precy))
         pointMilieu.degre = 2
         root.add_widget(pointMilieu)
     
@@ -184,7 +182,7 @@ class Tracer(Widget):
         # d'arrivée(x)...(dans first on stocke une instance de point())
         # sinon : on remove à partir de if ! isinstance() la ligne de tracer()
         '''
-    if not self.ligne:
+        if not self.ligne:
             return
         self.ligne.valid = False
         self.ligne.valid2 = True
@@ -198,13 +196,12 @@ class Tracer(Widget):
         # creation du nouveau point resultant
         print self.ligne.valid, self.ligne.valid2, self.ligne.valid3
         if self.ligne.valid is True and self.ligne.valid2 is True and self.ligne.valid3 is True:
-                self.ligne.first.degre += 1
-                self.ligne.last.degre += 1
-                self.ligne.valid = True
+            self.ligne.first.degre += 1
+            self.ligne.last.degre += 1
+            self.ligne.valid = True
             self.creation_Point_Milieu(self.ligne)
        #quand la ligne est invalidée on la remove de la fenetre
         if self.ligne.valid is False or self.ligne.valid2 is False:
-
             self.remove_widget(self.ligne)
         #remise à None : pour recommencer une ligne de "zero"
         self.ligne = None    
