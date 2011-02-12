@@ -6,9 +6,9 @@ from kivy.uix.widget import Widget
 class Ligne(Widget):
     w, h = Window.size
     points = ListProperty([])
-    valid = BooleanProperty(True) # detection des problemes de base : degre, reliage au deux points
-    valid2 = BooleanProperty(True) # detection d'une traverser d'un point
-    valid3 = BooleanProperty(True) # detection d'un croisement de ligne
+    validationBasique = BooleanProperty(True) # detection des problemes de base : degre, reliage au deux points
+    valideTraverse = BooleanProperty(True) # detection d'une traverser d'un point
+    valideCroise = BooleanProperty(True) # detection d'un croisement de ligne
     first = ObjectProperty
     last = ObjectProperty
     pointPrecedent = ObjectProperty
