@@ -5,7 +5,7 @@
 
 
 #Tous les imports utiles et nécessaires pour le bon déroulement du programme
-
+from sys import argv
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.core.window import Window
@@ -37,7 +37,10 @@ cpt =  0
 
 class PointApp(App):
     def build(self):
-        Builder.load_file('sprouts.kv', rulesonly=True)
+        if '--debug' in argv:
+            Builder.load_file('sprouts_debug.kv', rulesonly=True)
+        else:
+            Builder.load_file('sprouts.kv', rulesonly=True)
         #variable contenant le terrain de jeu (se referer à l'arbre)
         self.rootGame = None
         #creation du menu
