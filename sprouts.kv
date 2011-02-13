@@ -26,7 +26,7 @@
             size: (self.maxx-self.minx, self.maxy-self.miny)
         Color:
         #si valid : vert sinon rouge
-            rgb:(0, 1, 0) if self.validationBasique else (1, 0, 0)
+            rgb:(0, 1, 0) if self.valid else (1, 0, 0)
         #pour une courbe ==> creer un objet graphique
         Line:
             points: self.points
