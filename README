@@ -5,7 +5,9 @@ To launch :
 install python : sudo apt-get install python
 install kivy : http://kivy.org/docs/guide/installation.html
 
-run python main.py
+Two version:
+debug : python Sprouts.py --debug
+normal: python Sprouts.py
 
 Enjoy !
 
