@@ -6,12 +6,10 @@ from kivy.uix.widget import Widget
 class Ligne(Widget):
     w, h = Window.size
     points = ListProperty([])
-    validationBasique = BooleanProperty(True) # detection des problemes de base : degre, reliage au deux points
-    valideTraverse = BooleanProperty(True) # detection d'une traverser d'un point
-    valideCroise = BooleanProperty(True) # detection d'un croisement de ligne
-    first = ObjectProperty
-    last = ObjectProperty
-    pointPrecedent = ObjectProperty
+    valid = BooleanProperty(True) # detection des problemes de base : degre, reliage au deux points
+    first = ObjectProperty(None)
+    last = ObjectProperty(None)
+    pointPrecedent = ObjectProperty(None)
     minx = NumericProperty(w)
     miny = NumericProperty(h)
     maxx = NumericProperty(0)
@@ -21,3 +19,5 @@ class Ligne(Widget):
     longueur = NumericProperty(0)
     milieu = NumericProperty(0)
     sortiDuPoint = BooleanProperty(False)
+
+
