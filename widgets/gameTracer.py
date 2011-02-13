@@ -18,7 +18,6 @@ def intersect(A,B,C,D):
 
 class Tracer(Widget):
     '''Classe Tracer() gère l'affichage des lignes graphiquement
-    possède 3 méthodes : down(), move() et up()
     '''
 
     def __init__(self, **kwargs):
@@ -43,14 +42,13 @@ class Tracer(Widget):
         for child in root.children:
             if not isinstance(child, Point):
                 continue
-            
             if not child.collide_point(touch.x, touch.y):
                 continue
             print child.degre
             if child.degre > 2:
                 continue
-            print child, 'je suis touché, argh je me meurs'
-            self.ligne = Ligne(points=[child.center_x, child.center_y], validationBasique=True, first=child)
+            print child, 'je suis touché'
+            self.ligne = Ligne(points=[child.center_x, child.center_y], first=child)
             self.ligne.xprec = touch.x
             self.ligne.yprec = touch.y
             self.add_widget(self.ligne)
@@ -61,12 +59,11 @@ class Tracer(Widget):
         '''methode on_touch_move(): quand on move un event
         - si tout est ok dans on_touch_down(), on trace
         - calcul en live des x et y minimaux / maximaux afin de tracer les bbox
-        - calcul de la longueur courante de la ligne     racine carrée de ((x2-x1) * (x2-x1) + ((y2-y1)*(y2-y1))
+        - calcul de la longueur courante de la ligne racine carrée de ((x2-x1) * (x2-x1) + ((y2-y1)*(y2-y1))
 
         '''
         #on creer la variable precedentTouch si il n'y a pas encore eu de tracer de ligne
         if self.ligne:
-
             self.ligne.points = self.ligne.points + [touch.x, touch.y]
             self.ligne.longueur = self.ligne.longueur + sqrt((touch.x - self.ligne.xprec) * (touch.x - self.ligne.xprec) + (touch.y - self.ligne.yprec) * (touch.y - self.ligne.yprec))
             print 'longueur courante = ' ,self.ligne.longueur
@@ -82,12 +79,11 @@ class Tracer(Widget):
                 self.ligne.maxy = touch.y
 
     def validation(self, ligne, touch):
-   #validation de toutes les regles de base : 
+        '''validation de toutes les regles de base : 
         #- si une ligne est bien reliée a deux points 
         #- si une ligne ne traverse pas d'autre point
         #- si une ligne respecte les degrés des points auquelle elle a été reliée
-        #- si elle ne croise pas d'autre trait [ a completer si necessaire ] 
-    
+        #- si elle ne croise pas d'autre trait [ a completer si necessaire ] '''
     
         root = self.parent
         for child in root.children:
@@ -98,25 +94,22 @@ class Tracer(Widget):
             ligne.last = child
             if ligne.first == child:
                 if ligne.longueur < 2*pi*12.25:  #perimetre d'un point ! 
-                    ligne.validationBasique = False
+                    ligne.valid = False
                     continue
                 if child.degre > 1:
                     print ' trop de branche'
-                    ligne.validationBasique = False
+                    ligne.valid = False
                     continue
             if child.degre > 2:
                 print ' trop de branche'
-                ligne.validationBasique = False
+                ligne.valid = False
                 continue
             '''on regarde si la ligne n'a pas traversée de point durant le tracer:
          bug.  
             '''
-            ligne.validationBasique = True
-            self.ligne.valideTraverse = self.validation_Traversee(ligne)
+            print 'valid de validation ', ligne.valid
+            ligne.valid = self.validation_Traversee(ligne)
         
-        
-        
-
     def validation_Traversee(self, ligne):
         #fonction qui permet de voir si la ligne tracée n'a pas traversée de point
         root = self.parent
@@ -130,9 +123,10 @@ class Tracer(Widget):
                     continue
                 coordonneeX , coordonneeY = child.pos
                 if coorPointX < coordonneeX +25 and coorPointX > coordonneeX-25 and coorPointY < coordonneeY +25 and coorPointY > coordonneeY-25:    
-                    self.ligne.valideTraverse = False
+                    self.ligne.valid = False
                     continue
-        return self.ligne.valideTraverse
+                print 'valid de validation_travaersée ', ligne.valid
+        return self.ligne.valid
 
 
     def test_Intersection_Ligne(self, l1):
@@ -141,10 +135,10 @@ class Tracer(Widget):
             if l1 is l2: continue
             if self.is_intersect(l1.points, l2.points):
                 print 'intersection entre' ,l1,l2
-                l1.valideCroise = False
-        print 'valideCroise fonction= ' , self.ligne.valideCroise
-        # on retourne la troisieme validation
-        return self.ligne.valideCroise
+                l1.valid = False
+                print 'valid de intersection de ligne', l1.valid
+        return self.ligne.valid
+
 
     def creation_Point_Milieu(self, ligne):
         '''creer le point au milieu de la ligne''' 
@@ -184,25 +178,20 @@ class Tracer(Widget):
         '''
         if not self.ligne:
             return
-        self.ligne.validationBasique = False
-        self.ligne.valideTraverse = True
-        self.ligne.valideCroise = True
-        # ensemble de tout les tests ,  remplie tout les champs: validationBasique , valideTraverse, et valideCroise 
         self.validation(self.ligne, touch) 
      	#Test de l'intersection entre deux ensembles de points
          #inclure le test de la Bbox ICI
         '''on applique ici la fonction is_intersect() qui determine si il y a
         oui ou non intersection de la ligne tracée avec une autre du plateau'''
-        self.ligne.valideCroise = self.test_Intersection_Ligne(self.ligne)
+        
+        self.ligne.valid = self.test_Intersection_Ligne(self.ligne)
         # creation du nouveau point resultant
-        print self.ligne.validationBasique, self.ligne.valideTraverse, self.ligne.valideCroise
-        if self.ligne.validationBasique is True and self.ligne.valideTraverse is True and self.ligne.valideCroise is True:
+        if self.ligne.valid is True:
             self.ligne.first.degre += 1
             self.ligne.last.degre += 1
-            self.ligne.validationBasique = True
             self.creation_Point_Milieu(self.ligne)
        #quand la ligne est invalidée on la remove de la fenetre
-        if self.ligne.validationBasique is False or self.ligne.valideTraverse is False or self.ligne.valideCroise is False:
+        if self.ligne.valid is False:
             self.remove_widget(self.ligne)
         #remise à None : pour recommencer une ligne de "zero"
         self.ligne = None    
