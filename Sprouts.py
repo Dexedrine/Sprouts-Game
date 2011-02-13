@@ -70,8 +70,8 @@ class PointApp(App):
         layout.add_widget(btnSettings)
         layout.add_widget(btnQuit)
         #on attache = quand on clic, pouf c'est la méthode show_game qui se lance
-        btnPlay.bind(on_press=self.show_select)
-        btnQuit.bind(on_press=self.show_quit)
+        btnPlay.bind(on_release=self.show_select)
+        btnQuit.bind(on_release=self.show_quit)
         return layout
 
     def show_menu(self, *args):
@@ -114,9 +114,10 @@ class PointApp(App):
         '''
         Window.add_widget(self.rootSelect)
         self.hide_menu()
-        self.btnOk.bind(on_press=self.toto)
+        self.btnOk.bind(on_release=self.toto)
         self.btnDel.bind(on_press=self.hide_select)
-        self.slid.bind(on_press=self.toto)
+        self.btnDel.bind(on_release=self.show_menu)
+        self.slid.bind(on_release=self.toto)
         print 'valeur par default', self.nb
         
     def hide_select(self, *args):
@@ -128,9 +129,9 @@ class PointApp(App):
     def toto(self, *args):
         self.nbDep = round(self.slid.value)
         print 'valeur selectionnée', self.nbDep
-        self.btnOk.bind(on_press=self.hide_select)
-        self.btnOk.bind(on_press=self.show_game)
-        self.btnDel.bind(on_press=self.show_menu)
+        self.btnOk.bind(on_release=self.hide_select)
+        self.btnOk.bind(on_release=self.show_game)
+        self.btnDel.bind(on_release=self.show_menu)
 
 
 
@@ -217,8 +218,8 @@ class PointApp(App):
             
     def show_quit(self, *args):
         Window.add_widget(self.rootQuit)
-        self.btnYes.bind(on_press=self.stop)
-        self.btnNo.bind(on_press=self.hide_quit)
+        self.btnYes.bind(on_release=self.stop)
+        self.btnNo.bind(on_release=self.hide_quit)
         self.btnNo.bind(on_release=self.show_menu)
         self.hide_menu()
 
