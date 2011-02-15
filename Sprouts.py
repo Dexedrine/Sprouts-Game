@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Sprouts Game, a mathematical game.
 Copyright (C) 2011  Meresse Lucie and Martin Nathanaël
@@ -18,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/
 
 
 
-# -*- coding: utf-8 -*-
+
 
 #pour  l'importation :
 
