@@ -1,26 +1,54 @@
-Rapport d'activité du projet Sprouts-Game
+Rapport d'activité du projet Sprouts-Game : Martin Nathanaël et Meresse Lucie
 
-Grâce a nos expériences personnelles (projet guerre des robot au S2 et projet personnel), nous avons appris à ne pas nous jeter tête baissé dans un projet. C'est pour cela que nous avons consacré la première semaine à l'étude et à la décomposition du jeu des pousses.
-Avec ce projet, nous avons eu la possibilité d'apprendre un nouveau langage : Python et de mettre à profit les enseignements des derniers cours de S3 à savoir l'utilisation d'un framework, dans notre cas Kivy. Ce dernier est un framework permettant d'utiliser la souris, le multitouch et de mettre les programmes réalisés sur mobile (Android). Outre l'opportunité d'apprendre un langage en autodidacte, nous y avons vu la possibilité de nous démarquer par rapport aux autres binômes qui restent assez conventionnels en utilisant Java.
+Choix technologiques :
 
-Afin d'avancer au mieux, nous avons décider de nous répartir les tâches, par exemple Nat s'est occupé du calcul des lignes alors que Lucie s'est occupé de leur croisement et ainsi de suite. Pour facilité cette méthode de travail nous avons utliser le site de dépôt gitHub (https://github.com/Dexedrine/Sprouts-Game).
+Grâce à nos expériences personnelles (projet guerre des robot au S2 et projets personnels), nous avons appris à ne pas nous jeter tête baissé dans un projet. C'est pour cela que nous avons consacré la première semaine à l'étude et à la décomposition du jeu des pousses(voir cahier des charges ci-dessous).
 
-Avant de débuter chaque séance nous avons essayer de définir un cahier des charges pour les séances à venir et si l'on retrace nos activites on peut en ressortir ceci :
-création des classes Point (comporte les points), Ligne, Tracer( comporte les méthodes down, move, up, croisemtns de ligne, calcul du centre, positionnement au centre de la ligne), Sprouts( methodes pour l'affichage graphique, création aléatoire des points au début du jeu)
+Avec ce projet, nous avons eu la possibilité d'apprendre un nouveau langage : Python et de mettre à profit les enseignements des derniers cours de S3 à savoir l'utilisation d'un framework, dans notre cas Kivy. Ce dernier est un framework permettant d'utiliser la souris, le multitouch et de mettre les programmes réalisés sur mobile (Android v 2.2) nativement. Au cours du déroulement de notre projet, nous nous sommes investi dans la communauté "kivy" en ouvrant des rapports d'erreurs sur le site de dépôt GitHub, en discutant avec eux sur IRC et donc de contribuer au framework.
 
-' ' ' 
-- Création d'un certain nombre de point à des positions aléatoires
- - La ligne tracée par l'utilisateur est faite sous forme d'un ensemble de points
- - Tracer la ligne si et seulement si l'utilisateur relie deux points DISTINCTS, si le noeud a encore la possibilité d'accepter des dégres 
- - creation des bounding Box autour des lignes afin de les utiliser pour une optimisation future( recherche des xmax/min et ymax/min ) 
- - gerer la creation du nouveau point en s'appuyant sur la distance moyenne 
- - Gerer le croisement de ligne 
- - creation du menu 
-creation du choix nombre de points au debut via un slider' ' ' 
+Outre l'opportunité d'apprendre un langage en autodidacte, nous y avons vu la possibilité de nous démarquer par rapport aux autres binômes qui restent assez conventionnels en utilisant Java et de développer l'utilisation de l'anglais en pratique c'est à dire pour exposer les bugs du frameworks et nos problèmes techniques par exemple.
+
+Afin d'avancer au mieux, nous avons décider de nous répartir les tâches, par exemple Nathanaël s'est occupé du calcul de la longueur des lignes alors que Lucie s'est occupé de leur croisement et ainsi de suite. Pour facilité cette méthode de travail nous avons utliser le site de dépôt gitHub (https://github.com/Dexedrine/Sprouts-Game). Cette utilisation est aussi un plus, puiqu'elle nous a permit de nous sensibiliser à l'utilisation de site de partage de sources (utilisaion de GitHub et/ou Subversion en entreprise).
+
+Cahier des charges :
+
+Avant de débuter chaque séance nous avons essayer de définir un cahier des charges pour les séances à venir. 
+
+Première semaine :
+
+- Determiner les différentes classes qui seront utilisées par la suite : Point, Ligne, Tracer, Main.
+- Decomposition du projet en différents axes : rendu graphique, tracer de ligne, création aléatoire des points
+
+Deuxième semaine :
+
+- En nous projetant pour la suite du projet, nous avons réflechi a l'optimisation des calculs pour déterminer le croisement des lignes en employant des Bounding Box
+- Etant donné qu'il est plus intuitif de relier deux points entre eux et de créer un point au milieu de cette dernière nous avons opter pour cette solution !
+- Calcul de la longueur de la ligne tracée
+
+Troisième semaine :
+
+- Division du programme : chaque classe = un fichier
+- Ajout d'un menu : selection jouer, settings, scores et quitter
+- Trouver le milieu de la ligne + création du noeud au centre (a recentrer par la suite)
+- Modification du degré du noeud lors du rattachement des lignes
+- Algo d'intersection de ligne (algo trouvé sur internet)
+
+Quatrième semaine :
+
+- Ajout d'un écran entre le menu et la création du jeu pour permettre au joueur de selectionner le nombre de noeuds a créer en début de partie via un slider
+- Algo de verification pour la traversée des points
+- Allegement du code (notamment dans gameTracer())
+- Modification du fichier .kv pour l'affichage graphique (modification de la couleur des points selon leur degre et visualisation de leur degre a l'interieur du noeud)
+- Modification du menu : changement du on_press des boutons en on_release
+- Ajout de la licence GPL
 
 
-Nous avons aussi défini le reste du travail à effectuer :
+TODO LIST :
 
+- "desactiver" l'interieur des noeuds afin d'empecher l'application de l'algorithme du croisement de ligne
+- mettre en place l'algorithme de fin ( detailler)
+- centrer chaque noeud au milieu de la ligne tracée
+- 
 
 -determiner la fin de la partie(inclure un timer, methodes des polygones a definir)
 -gerer les scores
