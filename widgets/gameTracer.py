@@ -79,13 +79,17 @@ class Tracer(Widget):
         #- si une ligne ne traverse pas d'autre point
         #- si une ligne respecte les degrés des points auquelle elle a été reliée
         #- si elle ne croise pas d'autre trait [ a completer si necessaire ] '''
-    
+
+        # on commence la verification de la ligne
+        ligne.valid = False
+
         root = self.parent
         for child in root.children:
             if not isinstance(child, Point):
                 continue
             if not child.collide_point(touch.x, touch.y):
                 continue
+            ligne.valid = True
             ligne.last = child
             if ligne.first == child:
                 if ligne.longueur < 2*pi*12.25:  #perimetre d'un point ! 
