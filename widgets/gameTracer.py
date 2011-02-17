@@ -153,7 +153,7 @@ class Tracer(Widget):
             precx = cx
             precy = cy
 
-        pointMilieu = Point(size=(25, 25), pos =(precx, precy))
+        pointMilieu = Point(size=(25, 25), pos =(precx-12.5, precy-12.5))
         pointMilieu.degre = 2
         root.add_widget(pointMilieu)
     
