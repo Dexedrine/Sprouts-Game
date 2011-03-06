@@ -59,7 +59,7 @@ class Tracer(Widget):
 
         '''
         if self.ligne:
-            self.ligne.points = self.ligne.points + [touch.x, touch.y]
+            self.ligne.points.extend([touch.x, touch.y])
             self.ligne.longueur = self.ligne.longueur + sqrt((touch.x - self.ligne.xprec) * (touch.x - self.ligne.xprec) + (touch.y - self.ligne.yprec) * (touch.y - self.ligne.yprec))
             self.ligne.xprec = touch.x
             self.ligne.yprec = touch.y
