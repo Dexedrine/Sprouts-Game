@@ -182,20 +182,43 @@ class Tracer(Widget):
 
 
     def is_intersect(self, l1, l2):#on passe deux ensembles de points = ligne
+        root = self.parent
+        colision = False
         for i in xrange(0, len(l1)-4, 2):
             '''on recupère le point precedent(xp et yp) et le point current de la première
-            ligne(xc et yc)'''
+            ligne(xc et yc)
+            '''
+            colision = False
             xp = l1[i]
             yp = l1[i+1]
             xc = l1[i+2]
             yc = l1[i+3]
+            for child in root.children:
+                if not isinstance(child, Point):
+                    continue
+                if child.collide_point(xc, yp):
+                    colision = True
+                    print "on a eviter une colision dans un point ! ouff !! "
+                    break
+            if colision == True: # si on a detecter que la coordonnée était dans un noeud alors on doit changer de coordonnée
+                continue
             for j in xrange(0, len(l2)-4, 2):
                 ''' on recupere le point precedent (xpb et ypb) et le point current de la
                 seconde ligne (xcb et ycb)'''
+                colision = False
                 xpb = l2[j]
                 ypb = l2[j+1]
                 xcb = l2[j+2]
                 ycb = l2[j+3]
+                for child in root.children:
+                    if not isinstance(child, Point):
+                        continue
+                    if child.collide_point(xcb, ycb):
+                        colision = True
+                        print "on a eviter une colision dans un point ! ouff !! "
+                        break
+                if colision == True: # si on a detecter que la coordonnée était dans un noeud alors on doit changer de coordonnée
+                    continue 
                 '''on utilise la fonction definie en debut de programme, elle a
                 été trouvé sur le net, elle ne retourne pas la position du
                 croisement'''

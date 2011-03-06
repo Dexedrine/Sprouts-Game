@@ -19,5 +19,6 @@ class Ligne(Widget):
     longueur = NumericProperty(0)
     milieu = NumericProperty(0)
     sortiDuPoint = BooleanProperty(False)
+    toucheUnPoint = BooleanProperty(False)
 
 
