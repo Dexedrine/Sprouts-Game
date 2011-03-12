@@ -3,7 +3,7 @@ from kivy.uix.widget import Widget
 from widgets.gamepoint import Point
 from math import sqrt, pi
 from widgets.gameLigne import Ligne
-
+from kivy.clock import Clock
 '''Algo d'intersection trouvé sur internet :
     http://www.bryceboe.com/2006/10/23/line-segment-intersection-algorithm/'''
 def ccw(A,B,C):
@@ -196,9 +196,8 @@ class Tracer(Widget):
             for child in root.children:
                 if not isinstance(child, Point):
                     continue
-                if child.collide_point(xc, yp):
+                if child.collide_point(xp, yp):
                     colision = True
-                    print "on a eviter une colision dans un point ! ouff !! "
                     break
             if colision == True: # si on a detecter que la coordonnée était dans un noeud alors on doit changer de coordonnée
                 continue
@@ -213,9 +212,8 @@ class Tracer(Widget):
                 for child in root.children:
                     if not isinstance(child, Point):
                         continue
-                    if child.collide_point(xcb, ycb):
+                    if child.collide_point(xpb, ypb):
                         colision = True
-                        print "on a eviter une colision dans un point ! ouff !! "
                         break
                 if colision == True: # si on a detecter que la coordonnée était dans un noeud alors on doit changer de coordonnée
                     continue 
