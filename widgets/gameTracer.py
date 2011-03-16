@@ -4,6 +4,7 @@ from widgets.gamepoint import Point
 from math import sqrt, pi
 from widgets.gameLigne import Ligne
 from kivy.clock import Clock
+from kivy.graphics.vertex_instructions import Rectangle
 '''Algo d'intersection trouvé sur internet :
     http://www.bryceboe.com/2006/10/23/line-segment-intersection-algorithm/'''
 def ccw(A,B,C):
@@ -72,6 +73,7 @@ class Tracer(Widget):
             if self.ligne.maxy < touch.y:
                 self.ligne.maxy = touch.y
             print 'longueur courante = ' ,self.ligne.longueur
+        
 
     def validation(self, ligne, touch):
         '''validation de toutes les regles de base : 
@@ -109,9 +111,11 @@ class Tracer(Widget):
         ###intersection###
         for l2 in self.children: #je recupere ttes mes lignes
             if ligne is l2: continue
-            if self.is_intersect(ligne.points, l2.points):
-                print 'intersection entre :' , ligne, 'et ', l2
-                ligne.valid = False
+            if ligne.collide_widget(l2):
+                print("on collide !! ")
+                if self.is_intersect(ligne.points, l2.points):
+                    print 'intersection entre :' , ligne, 'et ', l2
+                    ligne.valid = False
             
         print 'valid de intersection de ligne', ligne.valid
         if ligne.valid is False:
@@ -169,6 +173,7 @@ class Tracer(Widget):
         '''
         if not self.ligne:
             return
+        self.ligne.box = Rectangle(size=(self.ligne.maxx-self.ligne.minx, self.ligne.maxy-self.ligne.miny), pos =(self.ligne.minx, self.ligne.miny))
         if self.validation(self.ligne, touch):
             # TODO:inclure le test de la Bbox ICI
             self.ligne.first.degre += 1

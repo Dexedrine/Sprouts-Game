@@ -2,6 +2,7 @@
 from kivy.properties import ListProperty, BooleanProperty, NumericProperty, ObjectProperty
 from kivy.core.window import Window
 from kivy.uix.widget import Widget
+from kivy.graphics.vertex_instructions import Rectangle
 
 class Ligne(Widget):
     w, h = Window.size
@@ -20,5 +21,6 @@ class Ligne(Widget):
     milieu = NumericProperty(0)
     sortiDuPoint = BooleanProperty(False)
     toucheUnPoint = BooleanProperty(False)
+    box = Rectangle(size=(w, h), pos =(0,0))
 
 
