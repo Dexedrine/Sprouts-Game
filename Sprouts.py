@@ -37,6 +37,8 @@ from kivy.vector import Vector
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.slider import Slider
+from kivy.uix.label import Label
+from kivy.clock import Clock
 
 
 #import de nos propres widgets depuis des fichiers "à part"
@@ -45,6 +47,10 @@ from kivy.uix.slider import Slider
 from widgets.gamepoint import Point
 from widgets.gameTracer import Tracer
 from widgets.gameLigne import Ligne
+
+# reseau
+
+from network.server import SproutsServer
 
 '''déclaration du cpt qui comptabilise le nombre de coups jouer pendant la
 partie. Déclaré en debut comme ça accessible partout sans avoir besoin de mettre
@@ -67,11 +73,82 @@ class PointApp(App):
         self.rootGame = None
         #creation du menu
         self.rootMenu = self.create_menu()
-        #affichage du menu
-        self.show_menu()
         #creation du quit
         self.rootQuit = self.create_quit()
         self.rootSelect = self.create_select()
+        # creation ecran server
+        self.rootServer = self.create_server()
+        if '--server' in argv:
+            self.start_server()
+        else:
+            #affichage du menu
+            self.show_menu()
+
+    def start_server(self, *args):
+        # creation du server sprout game
+        self.server = SproutsServer(4680)
+        self.server.start()
+        # installation de la method pour lire les messages de la queue (fifo)
+        Clock.schedule_interval(self.server_lire_queue, 1 / 5.)
+        # affichage ecran server
+        self.show_server()
+
+    def stop_server(self, *args):
+        Clock.unschedule(self.server_lire_queue)
+        self.server.stop()
+        self.server = None
+        self.hide_all()
+        self.show_menu()
+
+    def create_server(self, *args):
+        layout = BoxLayout(orientation='vertical', padding=100, spacing =5)
+        text = Label(text='En attente d\'un client...')
+        btnQuit = Button(text='Quitter')
+        btnQuit.bind(on_release=self.stop_server)
+        layout.add_widget(text)
+        layout.add_widget(btnQuit)
+        return layout
+
+    def show_server(self, *args):
+        self.hide_all()
+        Window.add_widget(self.rootServer)
+
+    def hide_server(self, *args):
+        Window.remove_widget(self.rootServer)
+
+    def server_lire_queue(self, *args):
+        commande = self.server.readCmd()
+        if commande is None:
+            return
+        print 'Main: lecture commande:', commande
+        if commande == 'READY':
+            print 'Ok... read... genial.'
+        elif commande == 'PONG':
+            print 'Ok... annule l\'inactivité'
+        elif commande.startswith('LIGNE'):
+            print '... ok faut lire les points !'
+        elif commande.startswith('DISCONNECT'):
+            print 'Ok, le client veut quitter...'
+            self.stop_server()
+        elif commande == 'CLOSED':
+            print 'Erreur reseau ? On ferme tout.'
+            self.stop_server()
+        else:
+            print 'Commande recu invalid: <%s>' % commande
+            self.server.sendCmd('ERROR commande invalide')
+            self.stop_server()
+
+
+### Others ###
+
+    def hide_all(self):
+        self.hide_menu()
+        self.hide_server()
+        self.hide_select()
+        self.hide_quit()
+        self.hide_game()
+        #self.hide_scores()
+        #self.hide_settings()
        
 ### MENU ##
 
@@ -101,6 +178,7 @@ class PointApp(App):
         fonction qui affiche le menu
         on ajoute le widget rootMenu(qui contient le create_menu) a la fenetre pour qu'il soit visible
         '''
+        self.hide_all()
         Window.add_widget(self.rootMenu)
 
     def hide_menu(self, *args):
@@ -134,8 +212,8 @@ class PointApp(App):
         '''
         fonction qui affiche l'écran de selection du nbre de noeuds
         '''
+        self.hide_all()
         Window.add_widget(self.rootSelect)
-        self.hide_menu()
         self.btnOk.bind(on_release=self.toto)
         self.btnDel.bind(on_press=self.hide_select)
         self.btnDel.bind(on_release=self.show_menu)
@@ -211,13 +289,14 @@ class PointApp(App):
         - créer le jeu
         - add le jeu
         '''
+        #on cache le menu, sinon il y a superposition du menu et du terrain de
+        #jeu
+        self.hide_all()
+
         self.rootGame = self.create_game()
         #on ajoute le jeu crée a la fenetre Window pour qu'il apparaisse à
         #l'écran
         Window.add_widget(self.rootGame)
-        #on cache le menu, sinon il y a superposition du menu et du terrain de
-        #jeu
-        self.hide_menu()
 
     def hide_game(self, *args):
         '''
@@ -239,11 +318,11 @@ class PointApp(App):
         return layout
             
     def show_quit(self, *args):
+        self.hide_all()
         Window.add_widget(self.rootQuit)
         self.btnYes.bind(on_release=self.stop)
         self.btnNo.bind(on_release=self.hide_quit)
         self.btnNo.bind(on_release=self.show_menu)
-        self.hide_menu()
 
     def hide_quit(self, *args):
         Window.remove_widget(self.rootQuit)
