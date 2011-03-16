@@ -72,7 +72,7 @@ class Tracer(Widget):
                 self.ligne.maxx = touch.x
             if self.ligne.maxy < touch.y:
                 self.ligne.maxy = touch.y
-            print 'longueur courante = ' ,self.ligne.longueur
+                #print 'longueur courante = ' ,self.ligne.longueur
         
 
     def validation(self, ligne, touch):
