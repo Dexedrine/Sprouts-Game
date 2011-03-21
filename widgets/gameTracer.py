@@ -116,6 +116,7 @@ class Tracer(Widget):
                 if self.is_intersect(ligne.points, l2.points):
                     print 'intersection entre :' , ligne, 'et ', l2
                     ligne.valid = False
+                    break
             
         print 'valid de intersection de ligne', ligne.valid
         if ligne.valid is False:
