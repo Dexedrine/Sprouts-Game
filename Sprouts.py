@@ -59,8 +59,6 @@ self.
 cpt =  0
 
 '''
-
-
 #DEBUT du SproutsGame
 
 class PointApp(App):
@@ -76,6 +74,8 @@ class PointApp(App):
         #creation du quit
         self.rootQuit = self.create_quit()
         self.rootSelect = self.create_select()
+        self.rootRsx = self.create_rsx()
+
         # creation ecran server
         self.rootServer = self.create_server()
         if '--server' in argv:
@@ -110,6 +110,7 @@ class PointApp(App):
         return layout
 
     def show_server(self, *args):
+        self.show_select()
         self.hide_all()
         Window.add_widget(self.rootServer)
 
@@ -147,6 +148,7 @@ class PointApp(App):
         self.hide_select()
         self.hide_quit()
         self.hide_game()
+        self.hide_rsx()
         #self.hide_scores()
         #self.hide_settings()
        
@@ -169,7 +171,7 @@ class PointApp(App):
         layout.add_widget(btnSettings)
         layout.add_widget(btnQuit)
         #on attache = quand on clic, pouf c'est la méthode show_game qui se lance
-        btnPlay.bind(on_release=self.show_select)
+        btnPlay.bind(on_release=self.show_rsx)
         btnQuit.bind(on_release=self.show_quit)
         return layout
 
@@ -186,6 +188,32 @@ class PointApp(App):
         fonction qui retire le widget à la fenetre
         '''
         Window.remove_widget(self.rootMenu)
+
+### DEMANDE DU JEU EN RESEAU OU EN LOCAL ###
+
+    def create_rsx(self, *args):
+        layout = BoxLayout(orientation='vertical', padding=100, spacing =5)
+        btnLocal = Button(text='Jouer en local')
+        btnRsxS = Button(text='Jouer en réseau, être server')
+        btnRsxC = Button(text='Jouer en réseau, être client')
+        btnQuit = Button(text='Quit')
+        layout.add_widget(btnLocal)
+        layout.add_widget(btnRsxS)
+        layout.add_widget(btnRsxC)
+        layout.add_widget(btnQuit)
+
+        btnLocal.bind(on_release=self.show_select)
+        btnRsxS.bind(on_release = self.show_server)
+        # btnRsxC.bind_on_release = self.show_client)
+        btnQuit.bind(on_release=self.show_quit)
+        return layout
+
+    def show_rsx(self, *args):
+        self.hide_all()
+        Window.add_widget(self.rootRsx)
+
+    def hide_rsx(self, *args):
+        Window.remove_widget(self.rootRsx)
 
 
 #### Select n : nbre de noeuds présents en début de partie ####

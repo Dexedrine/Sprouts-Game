@@ -18,12 +18,12 @@ class SproutsServer(Thread):
         print 'Server démarre...'
         sockServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        # si on est sous linux ou mac, on tente de réutiliser l'addresse ip/port
+        # si on est sous linux ou mac, on tente de réutiliser l'adresse ip/port
         if os.name in ('posix', 'mac') and hasattr(socket, 'SO_REUSEADDR'):
             sockServer.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         try:
-            #le port est ouvert sur ttes les cartes rsx
+            #le port est ouvert sur ttes les cartes rsx avec le 0.0.0.0
             sockServer.bind(('0.0.0.0', self.port))
             #nombre de client accepté = 1
             sockServer.listen(1)
