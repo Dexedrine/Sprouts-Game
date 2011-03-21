@@ -6,7 +6,7 @@ from kivy.graphics.vertex_instructions import Rectangle
 
 class Ligne(Widget):
     w, h = Window.size
-    points = ListProperty([])
+    points = ListProperty([]) # liste de point au format [x, y, x2, y2, ..., xn, yn]
     valid = BooleanProperty(True) # detection des problemes de base : degre, reliage au deux points
     first = ObjectProperty(None)
     last = ObjectProperty(None)

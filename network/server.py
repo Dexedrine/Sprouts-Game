@@ -30,6 +30,7 @@ class SproutsServer(Thread):
 
             print 'Server: en attente d\'un client...'
             sockClient, addressClient = sockServer.accept()
+            self.queue.append('CLIENTCO')
 
             print 'Server: client connecté:', addressClient
             self.sock = sockClient
@@ -43,11 +44,13 @@ class SproutsServer(Thread):
                         data = sockClient.recv(1024)
                     except socket.timeout:
                         print 'error timeout'
+                        break
                     except socket.error:
                         print 'error socket'
                         self.quit = True
                         break
                     if not data:
+                        self.quit = True
                         break
                     resp += data
 

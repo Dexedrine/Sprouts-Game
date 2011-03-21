@@ -110,24 +110,102 @@ class PointApp(App):
         return layout
 
     def show_server(self, *args):
-        self.show_select()
         self.hide_all()
         Window.add_widget(self.rootServer)
 
     def hide_server(self, *args):
         Window.remove_widget(self.rootServer)
 
+    def server_send_line(self, instance, ligne):
+        #on creer la commande ligne a envoyer au client
+        cmd = 'LIGNE '
+        for coord in ligne.points:
+            cmd += str(coord) + ';'
+        self.server.sendCmd(cmd[:-1])
+        self.client_state['play'] = True
+        self.rootTracer.play = False
+
+    def server_send_point(self, instance, point):
+        #on creer la commande noeud a envoyer au client
+        cmd = 'NOEUD ' + str(point.x) + ';' + str(point.y)
+        self.server.sendCmd(cmd)
+
     def server_lire_queue(self, *args):
         commande = self.server.readCmd()
         if commande is None:
             return
         print 'Main: lecture commande:', commande
-        if commande == 'READY':
+        if commande == 'CLIENTCO':
+            print 'Un client est connecté'
+            #on envoye au client les points crées
+            #dictionnaire contenant les etats du client, nécessaire pour
+            #maintenir le protocol réseau
+            self.client_state = {}
+            self.client_state['points'] = self.create_listpoints()
+            self.client_state['timeout'] = 0
+            self.client_state['play'] = False
+            #on creer la commande noeud a envoye au client
+            cmd = 'NOEUD '
+            for point in self.client_state['points']:
+                cmd += '%d;%d;' % (point.x, point.y)
+            self.server.sendCmd(cmd)
+            cmd = 'MSG Le serveur commence la partie'
+            self.server.sendCmd(cmd)
+
+        elif commande == 'READY':
             print 'Ok... read... genial.'
+            #on creer le jeu
+            self.hide_all()
+            self.rootGame = self.create_game(self.client_state['points'])
+            Window.add_widget(self.rootGame)
+            #on ecoute la creation de ligne
+            self.rootTracer.bind(on_newline=self.server_send_line)
+            self.rootTracer.bind(on_newpoint=self.server_send_point)
+
         elif commande == 'PONG':
             print 'Ok... annule l\'inactivité'
-        elif commande.startswith('LIGNE'):
+
+        elif commande.startswith('LIGNE '):
             print '... ok faut lire les points !'
+            #on s'assure que c'est au client de jouer
+            if not self.client_state['play']:
+                self.server.sendCmd('ERROR erreur protocole, interdiction de jouer')
+                self.stop_server()
+                return
+            #on lit la ligne du client
+            try:
+                coords = commande[6:].split(';')
+                points = map(int, coords)
+                if len(points) % 2 == 1:
+                    self.server.sendCmd('ERROR erreur protocole, nombre de coordonnees invalide')
+                    self.stop_server()
+                    return
+            except:
+                self.server.sendCmd('ERROR erreur protocole, coordonnees non numeriques')
+                self.stop_server()
+                return
+            ligne = Ligne(points=points)
+            #on valide la ligne
+            if self.rootTracer.validation(ligne):
+                #on ajoute la ligne pour le tracer
+                self.rootTracer.add_widget(ligne)
+                ligne.first.degre += 1
+                ligne.last.degre += 1
+                milieu = self.rootTracer.creation_Point_Milieu(ligne)
+
+                #la ligne est valide, on a renvoit tel quel au client
+                self.server.sendCmd(commande)
+                #on renvoit aussi le point du milieu
+                self.server.sendCmd('NOEUD ' + str(milieu.x) + ';' + str(milieu.y))
+                #avec un petit message
+                self.server.sendCmd('MSG Ligne valide, le serveur joue')
+                #et on remet le client en attente
+                self.client_state['play'] = False
+                self.rootTracer.play = True
+
+            else:
+                self.server.sendCmd('FAIL+MSG Ligne invalide, rejoue')
+
         elif commande.startswith('DISCONNECT'):
             print 'Ok, le client veut quitter...'
             self.stop_server()
@@ -149,6 +227,7 @@ class PointApp(App):
         self.hide_quit()
         self.hide_game()
         self.hide_rsx()
+        self.hide_selectS()
         #self.hide_scores()
         #self.hide_settings()
        
@@ -203,7 +282,7 @@ class PointApp(App):
         layout.add_widget(btnQuit)
 
         btnLocal.bind(on_release=self.show_select)
-        btnRsxS.bind(on_release = self.show_server)
+        btnRsxS.bind(on_release = self.show_selectS)
         # btnRsxC.bind_on_release = self.show_client)
         btnQuit.bind(on_release=self.show_quit)
         return layout
@@ -215,7 +294,40 @@ class PointApp(App):
     def hide_rsx(self, *args):
         Window.remove_widget(self.rootRsx)
 
+    def create_selectS(self, *args):
+        self.slid = Slider(orientation='horizontal', min=0, max=10, value=3)
+        layout = BoxLayout(orientation='vertical', padding=100, spacing=5)
+        self.btnOk = Button(text='Ok')
+        self.btnDel = Button(text='Retour')
+        layout.add_widget(self.slid)
+        layout.add_widget(self.btnOk)
+        layout.add_widget(self.btnDel)
+        self.nb = self.slid.value
+        return layout
 
+    def show_selectS(self, *args):
+        '''
+        fonction qui affiche l'écran de selection du nbre de noeuds
+        '''
+        self.hide_all()
+        Window.add_widget(self.rootSelect)
+        self.btnOk.bind(on_release=self.totoS)
+        self.btnDel.bind(on_press=self.hide_select)
+        self.btnDel.bind(on_release=self.show_menu)
+        self.slid.bind(on_release=self.totoS)
+        print 'valeur par default', self.nb
+        
+    def hide_selectS(self, *args):
+        '''
+        fonction qui "hide" cet écran de selection
+        '''
+        Window.remove_widget(self.rootSelect)
+
+    def totoS(self, *args):
+        self.nbDep = round(self.slid.value)
+        self.btnOk.bind(on_release=self.hide_select)
+        self.btnOk.bind(on_release=self.start_server)
+        self.btnDel.bind(on_release=self.show_menu)
 #### Select n : nbre de noeuds présents en début de partie ####
 
     def create_select(self):
@@ -266,7 +378,7 @@ class PointApp(App):
 
 ### GAME ###
 
-    def create_game(self):
+    def create_game(self, listPoint=None):
         '''
         fonction qui crée un terrain de jeu :
             - apparition aléatoires des noeuds de début de jeu
@@ -274,10 +386,18 @@ class PointApp(App):
         '''WARNING : penser a inserer le return a l'écran de menu via un double
         clic sur l'écran
         '''
-        print 'createeeeeeeeeeeeeeee'
         # w, h = canvas.size(); 
         root = Widget()
         #root = ScatterPlane()
+        if not listPoint:
+            listPoint = self.create_listpoints()
+        for point in listPoint:
+            root.add_widget(point)
+        self.rootTracer = Tracer()
+        root.add_widget(self.rootTracer)
+        return root
+
+    def create_listpoints(self):
         '''
         ici on soustrait la taille du rond afin que l'affichage se fasse bien,
         qu'aucun noeud ne soit couper par les bords de la fenetre
@@ -289,10 +409,9 @@ class PointApp(App):
         listPoint = []
 
         #inclure n : nbre de noeuds
-
         while len(listPoint) != self.nbDep :
             point = Point(size=(25, 25),
-                          pos =(random()*w, random()*h))
+                          pos =(int(random()*w), int(random()*h)))
             ok = True
             v = Vector(point.center)
             for p in listPoint:
@@ -307,9 +426,8 @@ class PointApp(App):
                 soit affiché a l'écran
                 '''
                 listPoint.append(point)
-                root.add_widget(point)
-        root.add_widget(Tracer())
-        return root
+        return listPoint
+
 
     def show_game(self, *args):
         '''

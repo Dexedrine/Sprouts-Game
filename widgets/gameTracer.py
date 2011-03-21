@@ -24,8 +24,11 @@ class Tracer(Widget):
         ligne qui par la suite prendra la création de ligne
         '''
         super(Tracer, self).__init__(**kwargs)
+        self.register_event_type('on_newline')
+        self.register_event_type('on_newpoint')
         self.ligne = None
         self.bbox = [(), ()]
+        self.play = True
         #self.nbCoups = 0
 
     def on_touch_down(self, touch):
@@ -36,6 +39,8 @@ class Tracer(Widget):
         -créer et attache la ligne à Tracer
 
         '''
+        if not self.play:
+            return
         root = self.parent
         for child in root.children:
             if not isinstance(child, Point):
@@ -73,40 +78,60 @@ class Tracer(Widget):
             if self.ligne.maxy < touch.y:
                 self.ligne.maxy = touch.y
                 #print 'longueur courante = ' ,self.ligne.longueur
-        
 
-    def validation(self, ligne, touch):
-        '''validation de toutes les regles de base : 
-        #- si une ligne est bien reliée a deux points 
-        #- si une ligne ne traverse pas d'autre point
-        #- si une ligne respecte les degrés des points auquelle elle a été reliée
-        #- si elle ne croise pas d'autre trait [ a completer si necessaire ] '''
-
-        # on commence la verification de la ligne
-        ligne.valid = False
-
+    def recherche_point(self, x, y):
         root = self.parent
         for child in root.children:
             if not isinstance(child, Point):
                 continue
-            if not child.collide_point(touch.x, touch.y):
+            if not child.collide_point(x, y):
                 continue
-            ligne.valid = True
-            ligne.last = child
-            if ligne.first == child:
-                if ligne.longueur < 2*pi*12.25:  #perimetre d'un point ! 
-                    ligne.valid = False
-                    continue
-                if child.degre > 1:
-                    print 'trop de branche'
-                    ligne.valid = False
-                    continue
             if child.degre > 2:
-                print 'trop de branche'
+                continue
+            return child
+
+    def validation(self, ligne, touch=None):
+        '''validation de toutes les regles de base : 
+        #- si une ligne est bien reliée a deux points 
+        #- si une ligne ne traverse pas d'autre point
+        #- si une ligne respecte les degrés des points auquelle elle a été reliée
+        #- si elle ne croise pas d'autre trait [ a completer si necessaire ]
+        
+        Dans le cas où le client nous envoi une ligne, touch sera None. On
+        utilisera donc la dernière coordonnées (x, y) de la ligne.
+        '''
+
+        ligne.valid = True
+
+        # on recherche le point de début (s'il n'existe pas encore, cas réseau)
+        if not ligne.first:
+            ligne.first = self.recherche_point(ligne.points[0], ligne.points[1])
+            if not ligne.first:
                 ligne.valid = False
-                print 'valid de validation ', ligne.valid
-            if ligne.valid is False:
-                return
+                return False
+
+        # on recherche le point de fin
+        if touch:
+            x, y = touch.pos
+        else:
+            # on part de la fin de la liste de points
+            x = ligne.points[-2]
+            y = ligne.points[-1]
+        ligne.last = self.recherche_point(x, y)
+        if not ligne.last:
+            ligne.valid = False
+            return False
+
+        # ok, on a un point de debut et de fin, mais il se peut que le point de
+        # debut soit aussi le point de fin. dans ce cas, on s'assure que la
+        # longeur de la ligne est au minimum supérieur au périmètre d'un point
+        if ligne.first == ligne.last:
+            if ligne.longueur < 2*pi*12.25:  #perimetre d'un point ! 
+                ligne.valid = False
+                return False
+            if ligne.first > 1: #on s'assure qu'il y a au moins 2 degre de libre
+                ligne.valid = False
+                return False
 
         ###intersection###
         for l2 in self.children: #je recupere ttes mes lignes
@@ -123,6 +148,7 @@ class Tracer(Widget):
             return
 
         ###TRAVERSEE##
+        root = self.parent
         for point in xrange(len(ligne.points) / 2):
             coorPointX = ligne.points[point *2]
             coorPointY = ligne.points[point*2 +1]
@@ -132,7 +158,7 @@ class Tracer(Widget):
                 if child == ligne.first or child == ligne.last:
                     continue
                 coordonneeX , coordonneeY = child.pos
-                if coorPointX < coordonneeX +25 and coorPointX > coordonneeX-25 and coorPointY < coordonneeY +25 and coorPointY > coordonneeY-25:    
+                if coorPointX < coordonneeX +25 and coorPointX > coordonneeX-25 and coorPointY < coordonneeY +25 and coorPointY > coordonneeY-25:
                     ligne.valid = False
                     continue
         print 'valid de validation_traversée ', ligne.valid
@@ -141,7 +167,6 @@ class Tracer(Widget):
 
     def creation_Point_Milieu(self, ligne):
         '''creer le point au milieu de la ligne''' 
-        root = self.parent
         precx = ligne.points[0]
         precy = ligne.points[1]
         cx = None # n*2
@@ -158,9 +183,10 @@ class Tracer(Widget):
             precx = cx
             precy = cy
 
-        pointMilieu = Point(size=(25, 25), pos =(precx-12.5, precy-12.5))
+        pointMilieu = Point(size=(25, 25),
+                            pos =(int(precx-12.5), int(precy-12.5)))
         pointMilieu.degre = 2
-        root.add_widget(pointMilieu)
+        return pointMilieu
     
     def on_touch_up(self, touch):
         '''methode on_touch_up() = quand on up un event
@@ -179,7 +205,10 @@ class Tracer(Widget):
             # TODO:inclure le test de la Bbox ICI
             self.ligne.first.degre += 1
             self.ligne.last.degre += 1
-            self.creation_Point_Milieu(self.ligne)
+            pointMilieu = self.creation_Point_Milieu(self.ligne)
+            self.parent.add_widget(pointMilieu)
+            self.dispatch('on_newline', self.ligne)
+            self.dispatch('on_newpoint', pointMilieu)
         else:
             self.remove_widget(self.ligne)
         #remise à None : pour recommencer une ligne de "zero"
@@ -230,3 +259,8 @@ class Tracer(Widget):
                     return True
 
 
+    def on_newline(self, ligne):
+        pass
+
+    def on_newpoint(self, point):
+        pass
