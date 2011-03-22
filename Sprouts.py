@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/
 
 
 #Tous les imports utiles et nécessaires pour le bon déroulement du programme
+from functools import partial
 from sys import argv
 from kivy.app import App
 from kivy.lang import Builder
@@ -39,6 +40,8 @@ from kivy.uix.button import Button
 from kivy.uix.slider import Slider
 from kivy.uix.label import Label
 from kivy.clock import Clock
+from kivy.uix.textinput import TextInput
+from kivy.uix.anchorlayout import AnchorLayout
 
 
 #import de nos propres widgets depuis des fichiers "à part"
@@ -51,6 +54,7 @@ from widgets.gameLigne import Ligne
 # reseau
 
 from network.server import SproutsServer
+from network.client import SproutsClient
 
 '''déclaration du cpt qui comptabilise le nombre de coups jouer pendant la
 partie. Déclaré en debut comme ça accessible partout sans avoir besoin de mettre
@@ -75,6 +79,12 @@ class PointApp(App):
         self.rootQuit = self.create_quit()
         self.rootSelect = self.create_select()
         self.rootRsx = self.create_rsx()
+        #creation de l'écran d'erreur
+        self.rootErreur = self.create_erreur()
+
+        #creation ecran client
+        self.rootClient = self.create_rsx_client()
+        self.rootClientConnect = self.create_rsx_client_connect()
 
         # creation ecran server
         self.rootServer = self.create_server()
@@ -98,7 +108,7 @@ class PointApp(App):
         self.server.stop()
         self.server = None
         self.hide_all()
-        self.show_menu()
+        self.show_rsx()
 
     def create_server(self, *args):
         layout = BoxLayout(orientation='vertical', padding=100, spacing =5)
@@ -120,14 +130,15 @@ class PointApp(App):
         #on creer la commande ligne a envoyer au client
         cmd = 'LIGNE '
         for coord in ligne.points:
-            cmd += str(coord) + ';'
+            cmd += '%f;' % coord
         self.server.sendCmd(cmd[:-1])
         self.client_state['play'] = True
         self.rootTracer.play = False
 
     def server_send_point(self, instance, point):
         #on creer la commande noeud a envoyer au client
-        cmd = 'NOEUD ' + str(point.x) + ';' + str(point.y)
+        print 'booouh', instance, point
+        cmd = 'NOEUD %f;%f' % point.pos
         self.server.sendCmd(cmd)
 
     def server_lire_queue(self, *args):
@@ -135,7 +146,7 @@ class PointApp(App):
         if commande is None:
             return
         print 'Main: lecture commande:', commande
-        if commande == 'CLIENTCO':
+        if commande == 'SOCKETREADY':
             print 'Un client est connecté'
             #on envoye au client les points crées
             #dictionnaire contenant les etats du client, nécessaire pour
@@ -147,8 +158,8 @@ class PointApp(App):
             #on creer la commande noeud a envoye au client
             cmd = 'NOEUD '
             for point in self.client_state['points']:
-                cmd += '%d;%d;' % (point.x, point.y)
-            self.server.sendCmd(cmd)
+                cmd += '%f;%f;' % (point.x, point.y)
+            self.server.sendCmd(cmd[:-1])
             cmd = 'MSG Le serveur commence la partie'
             self.server.sendCmd(cmd)
 
@@ -158,7 +169,7 @@ class PointApp(App):
             self.hide_all()
             self.rootGame = self.create_game(self.client_state['points'])
             Window.add_widget(self.rootGame)
-            #on ecoute la creation de ligne
+            #on ecoute la creation de ligne et du point
             self.rootTracer.bind(on_newline=self.server_send_line)
             self.rootTracer.bind(on_newpoint=self.server_send_point)
 
@@ -171,19 +182,16 @@ class PointApp(App):
             if not self.client_state['play']:
                 self.server.sendCmd('ERROR erreur protocole, interdiction de jouer')
                 self.stop_server()
+                self.show_erreur('Erreur de protocole, abandon (not play)')
                 return
             #on lit la ligne du client
-            try:
-                coords = commande[6:].split(';')
-                points = map(int, coords)
-                if len(points) % 2 == 1:
-                    self.server.sendCmd('ERROR erreur protocole, nombre de coordonnees invalide')
-                    self.stop_server()
-                    return
-            except:
-                self.server.sendCmd('ERROR erreur protocole, coordonnees non numeriques')
+            points = self.convert_text_to_coords(commande[6:])
+            if points is None:
+                self.server.sendCmd('ERROR erreur protocole, coordonnees invalides')
                 self.stop_server()
+                self.show_erreur('Erreur de protocole, abandon (invalid coords)')
                 return
+
             ligne = Ligne(points=points)
             #on valide la ligne
             if self.rootTracer.validation(ligne):
@@ -192,6 +200,7 @@ class PointApp(App):
                 ligne.first.degre += 1
                 ligne.last.degre += 1
                 milieu = self.rootTracer.creation_Point_Milieu(ligne)
+                self.rootGame.add_widget(milieu)
 
                 #la ligne est valide, on a renvoit tel quel au client
                 self.server.sendCmd(commande)
@@ -204,12 +213,12 @@ class PointApp(App):
                 self.rootTracer.play = True
 
             else:
-                self.server.sendCmd('FAIL+MSG Ligne invalide, rejoue')
+                self.server.sendCmd('FAIL Ligne invalide, rejoue !')
 
         elif commande.startswith('DISCONNECT'):
             print 'Ok, le client veut quitter...'
             self.stop_server()
-        elif commande == 'CLOSED':
+        elif commande == 'SOCKETCLOSED':
             print 'Erreur reseau ? On ferme tout.'
             self.stop_server()
         else:
@@ -228,6 +237,9 @@ class PointApp(App):
         self.hide_game()
         self.hide_rsx()
         self.hide_selectS()
+        self.hide_rsx_client()
+        self.hide_rsx_client_connect()
+        self.hide_erreur()
         #self.hide_scores()
         #self.hide_settings()
        
@@ -282,8 +294,8 @@ class PointApp(App):
         layout.add_widget(btnQuit)
 
         btnLocal.bind(on_release=self.show_select)
-        btnRsxS.bind(on_release = self.show_selectS)
-        # btnRsxC.bind_on_release = self.show_client)
+        btnRsxS.bind(on_release=self.show_selectS)
+        btnRsxC.bind(on_release=self.show_rsx_client)
         btnQuit.bind(on_release=self.show_quit)
         return layout
 
@@ -316,7 +328,7 @@ class PointApp(App):
         self.btnDel.bind(on_release=self.show_menu)
         self.slid.bind(on_release=self.totoS)
         print 'valeur par default', self.nb
-        
+
     def hide_selectS(self, *args):
         '''
         fonction qui "hide" cet écran de selection
@@ -328,6 +340,187 @@ class PointApp(App):
         self.btnOk.bind(on_release=self.hide_select)
         self.btnOk.bind(on_release=self.start_server)
         self.btnDel.bind(on_release=self.show_menu)
+
+### Ecran réseau client ###
+
+    def create_rsx_client(self, *args):
+        anchor = AnchorLayout()
+        layout = BoxLayout(orientation='vertical', spacing=5,
+                           size_hint=(None, None),size=(400, 80))
+        anchor.add_widget(layout)
+        bh = BoxLayout(orientation='horizontal', size_hint=(1, None), height=30)
+        layout.add_widget(bh)
+        bh.add_widget(Label(text='Hôte ou adresse IP :'))
+
+        textinput = TextInput(multiline=False, text='127.0.0.1')
+        bh.add_widget(textinput)
+
+        bh = BoxLayout(orientation='horizontal', spacing=5)
+        layout.add_widget(bh)
+        btnRetour = Button(text='Retour')
+        btnRetour.bind(on_release=self.show_rsx)
+        bh.add_widget(btnRetour)
+
+        btnConnect = Button(text='Jouer !')
+        def appel_start_client(*args):
+            self.start_client(textinput.text)
+        btnConnect.bind(on_release=appel_start_client)
+        bh.add_widget(btnConnect)
+        return anchor
+
+    def show_rsx_client(self, *args):
+        self.hide_all()
+        Window.add_widget(self.rootClient)
+
+    def hide_rsx_client(self, *args):
+        Window.remove_widget(self.rootClient)
+
+
+### Ecran réseau client connexion ###
+
+    def start_client(self, host, *args):
+        #creation du client sprout game
+        self.client = SproutsClient(host, 4680)
+        self.client.start()
+        #installation de la method pour lire les messages de la queue (fifo)
+        Clock.schedule_interval(self.client_lire_queue, 1 / 5.)
+        # affichage écran server
+        self.show_rsx_client_connect()
+
+    def stop_client(self, *args):
+        Clock.unschedule(self.client_lire_queue)
+        self.client.stop()
+        self.client = None
+        self.hide_all()
+        self.show_rsx()
+
+    def create_rsx_client_connect(self, *args):
+        layout = BoxLayout(orientation='vertical', padding=100, spacing =5)
+        text = Label(text='Connexion au serveur en cours...')
+        btnQuit = Button(text='Quitter')
+        btnQuit.bind(on_release=self.stop_client)
+        layout.add_widget(text)
+        layout.add_widget(btnQuit)
+        return layout
+
+    def show_rsx_client_connect(self, *args):
+        self.hide_all()
+        Window.add_widget(self.rootClientConnect)
+
+    def hide_rsx_client_connect(self, *args):
+        Window.remove_widget(self.rootClientConnect)
+
+    def client_send_line(self, instance, ligne):
+        #on creer la commande ligne a envoyer au serveur
+        cmd = 'LIGNE '
+        for coord in ligne.points:
+            cmd += '%f;' % coord
+        self.client.sendCmd(cmd[:-1])
+        self.rootTracer.play = False
+        self.server_state['waitvalidation'] = True
+
+    def client_lire_queue(self, *args):
+        commande = self.client.readCmd()
+        if commande is None:
+            return
+        if commande == 'SOCKETREADY':
+            print 'On est connecté au serveur'
+            #dictionnaire contenant l'état du serveur, nécessaire pour maintenir
+            #le protocol réseau
+            self.server_state = {}
+            self.server_state['play'] = True
+            self.server_state['ready'] = False
+            self.server_state['waitvalidation'] = False
+            #on affiche le jeu
+            self.hide_all()
+            self.rootGame = self.create_game([])
+            self.rootTracer.play = False
+            self.rootTracer.networkclient = True
+            Window.add_widget(self.rootGame)
+            #on ecoute la creation de ligne
+            self.rootTracer.bind(on_newline=self.client_send_line)
+        elif commande == 'SOCKETCLOSED':
+            pass
+        elif commande.startswith('MSG '):
+            pass
+        elif commande.startswith('NOEUD '):
+            points = self.convert_text_to_coords(commande[6:])
+            if points is None:
+                self.client.sendCmd('DISCONNECT erreur protocole, coordonnees invalides')
+                self.stop_client()
+                self.show_erreur('Erreur de protocole, abandon (invalid coords)')
+                return
+            for i in xrange(0, len(points), 2):
+                x = points[i]
+                y = points[i+1]
+                point = self.create_point(x, y)
+                if self.server_state['ready']:
+                    point.degre = 2
+                self.rootGame.add_widget(point)
+            if not self.server_state['ready']:
+                self.server_state['ready'] = True
+                self.client.sendCmd('READY')
+
+        elif commande.startswith('LIGNE '):
+            points = self.convert_text_to_coords(commande[6:])
+            if points is None:
+                self.client.sendCmd('DISCONNECT erreur protocole, coordonnees invalides')
+                self.stop_client()
+                self.show_erreur('Erreur de protocole, abandon (invalid coords)')
+                return
+            ligne = Ligne(points=points)
+            if not self.rootTracer.validation(ligne, attachonly=True):
+                self.client.sendCmd('DISCONNECT impossible de verifier la ligne')
+                self.stop_client()
+                self.show_erreur('Erreur de protocole, abandon (verif ligne)')
+                return
+            ligne.first.degre += 1
+            ligne.last.degre += 1
+            self.rootTracer.add_widget(ligne)
+            if self.server_state['waitvalidation']:
+                self.server_state['waitvalidation'] = False
+            else:
+                self.rootTracer.play = True
+        elif commande == 'PING':
+            pass
+        elif commande.startswith('FAIL '):
+            self.server_state['waitvalidation'] = False
+            self.rootTracer.play = True
+
+
+    def convert_text_to_coords(self, text):
+        print 'convert_text_to_coords()', text
+        try:
+            coords = map(float, text.split(';'))
+            if len(coords) % 2 == 1:
+                print 'ERREUR 1'
+                return None
+            print 'OK 1', coords
+            return coords
+        except Exception, e:
+            print 'ERREUR 2', e
+            return None
+
+### Ecran d'erreur, qui peut être utilisé n'importe où ###
+
+    def create_erreur(self):
+        layout = BoxLayout(orientation='vertical', padding=100, spacing =5)
+        self.rootErreurText = Label(text='ERREUR')
+        btnQuit = Button(text='Ok')
+        btnQuit.bind(on_release=self.show_menu)
+        layout.add_widget(self.rootErreurText)
+        layout.add_widget(btnQuit)
+        return layout
+
+    def show_erreur(self, text):
+        self.hide_all()
+        self.rootErreurText.text = text
+        Window.add_widget(self.rootErreur)
+
+    def hide_erreur(self, *args):
+        Window.remove_widget(self.rootErreur)
+
+
 #### Select n : nbre de noeuds présents en début de partie ####
 
     def create_select(self):
@@ -389,13 +582,16 @@ class PointApp(App):
         # w, h = canvas.size(); 
         root = Widget()
         #root = ScatterPlane()
-        if not listPoint:
+        if listPoint is None:
             listPoint = self.create_listpoints()
         for point in listPoint:
             root.add_widget(point)
         self.rootTracer = Tracer()
         root.add_widget(self.rootTracer)
         return root
+
+    def create_point(self, x, y):
+        return Point(size=(25, 25), pos=(x, y))
 
     def create_listpoints(self):
         '''
@@ -410,8 +606,7 @@ class PointApp(App):
 
         #inclure n : nbre de noeuds
         while len(listPoint) != self.nbDep :
-            point = Point(size=(25, 25),
-                          pos =(int(random()*w), int(random()*h)))
+            point = self.create_point(int(random()*w), int(random()*h))
             ok = True
             v = Vector(point.center)
             for p in listPoint:

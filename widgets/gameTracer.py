@@ -29,6 +29,7 @@ class Tracer(Widget):
         self.ligne = None
         self.bbox = [(), ()]
         self.play = True
+        self.networkclient = False
         #self.nbCoups = 0
 
     def on_touch_down(self, touch):
@@ -66,18 +67,6 @@ class Tracer(Widget):
         '''
         if self.ligne:
             self.ligne.points.extend([touch.x, touch.y])
-            self.ligne.longueur = self.ligne.longueur + sqrt((touch.x - self.ligne.xprec) * (touch.x - self.ligne.xprec) + (touch.y - self.ligne.yprec) * (touch.y - self.ligne.yprec))
-            self.ligne.xprec = touch.x
-            self.ligne.yprec = touch.y
-            if self.ligne.minx > touch.x:
-                self.ligne.minx = touch.x
-            if self.ligne.miny > touch.y:
-                self.ligne.miny = touch.y
-            if self.ligne.maxx < touch.x:
-                self.ligne.maxx = touch.x
-            if self.ligne.maxy < touch.y:
-                self.ligne.maxy = touch.y
-                #print 'longueur courante = ' ,self.ligne.longueur
 
     def recherche_point(self, x, y):
         root = self.parent
@@ -90,7 +79,7 @@ class Tracer(Widget):
                 continue
             return child
 
-    def validation(self, ligne, touch=None):
+    def validation(self, ligne, touch=None, attachonly=False):
         '''validation de toutes les regles de base : 
         #- si une ligne est bien reliée a deux points 
         #- si une ligne ne traverse pas d'autre point
@@ -99,14 +88,41 @@ class Tracer(Widget):
         
         Dans le cas où le client nous envoi une ligne, touch sera None. On
         utilisera donc la dernière coordonnées (x, y) de la ligne.
+
+        If attachonly est True, on s'assurera qu'il y ai seuelemnt un point
+        first et last attaché.
         '''
 
+        print 'validation de ligne en cours...'
         ligne.valid = True
+
+        # calcul de la longueur de la ligne
+        points = ligne.points
+        longueur = 0
+        px, py = None, None
+        for x, y in zip(points[::2], points[1::2]):
+            # optimization de la boucle pour la bounding box
+            ligne.minx = min(x, ligne.minx)
+            ligne.maxx = max(x, ligne.maxx)
+            ligne.miny = min(y, ligne.miny)
+            ligne.maxy = max(y, ligne.maxy)
+            if px is None:
+                px, py = x, y
+            else:
+                longueur += sqrt((x - px) * (x - px) + (y - py) * (y - py))
+                px, py = x, y
+
+        ligne.longueur = longueur
+
+        # calcul de la bounding box
+        ligne.box = Rectangle(size=(ligne.maxx - ligne.minx, ligne.maxy - ligne.miny),
+                              pos=(ligne.minx, ligne.miny))
 
         # on recherche le point de début (s'il n'existe pas encore, cas réseau)
         if not ligne.first:
             ligne.first = self.recherche_point(ligne.points[0], ligne.points[1])
             if not ligne.first:
+                print 'validation erreur, impossible de trouver le point first'
                 ligne.valid = False
                 return False
 
@@ -119,8 +135,12 @@ class Tracer(Widget):
             y = ligne.points[-1]
         ligne.last = self.recherche_point(x, y)
         if not ligne.last:
+            print 'validation erreur, impossible de trouver le point last'
             ligne.valid = False
             return False
+
+        if attachonly:
+            return ligne.valid
 
         # ok, on a un point de debut et de fin, mais il se peut que le point de
         # debut soit aussi le point de fin. dans ce cas, on s'assure que la
@@ -183,8 +203,10 @@ class Tracer(Widget):
             precx = cx
             precy = cy
 
+        print 'MILIEUUUUUUUU', (precx, precy), ', ligne.milieu=', ligne.milieu, '; ligne.first/last', ligne.first.pos, ligne.last.pos
         pointMilieu = Point(size=(25, 25),
                             pos =(int(precx-12.5), int(precy-12.5)))
+        print 'POINT MILIEU', pointMilieu.pos, pointMilieu.x, pointMilieu.y
         pointMilieu.degre = 2
         return pointMilieu
     
@@ -200,7 +222,16 @@ class Tracer(Widget):
         '''
         if not self.ligne:
             return
-        self.ligne.box = Rectangle(size=(self.ligne.maxx-self.ligne.minx, self.ligne.maxy-self.ligne.miny), pos =(self.ligne.minx, self.ligne.miny))
+
+        if self.networkclient:
+            # en mode réseau, le client envoye la ligne au serveur
+            # et ne créer pas de ligne local ni de point du milieu
+            # toute la validation est faite coté serveur
+            self.dispatch('on_newline', self.ligne)
+            self.remove_widget(self.ligne)
+            self.ligne = None
+            return
+
         if self.validation(self.ligne, touch):
             # TODO:inclure le test de la Bbox ICI
             self.ligne.first.degre += 1
@@ -211,6 +242,7 @@ class Tracer(Widget):
             self.dispatch('on_newpoint', pointMilieu)
         else:
             self.remove_widget(self.ligne)
+
         #remise à None : pour recommencer une ligne de "zero"
         self.ligne = None    
 
