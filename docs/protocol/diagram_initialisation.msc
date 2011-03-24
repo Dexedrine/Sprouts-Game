@@ -1,0 +1,9 @@
+msc {
+	arcgradient = 8;
+
+	a [label="Server"], b [label="Client"];
+
+	a=>b [label="NOEUD <x;y;x2;y2;...;xn;yn>"];
+	b=>a [label="READY"];
+	a=>b [label="MSG Le serveur commence la partie"];
+}

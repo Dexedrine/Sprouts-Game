@@ -1,0 +1,31 @@
+msc {
+	arcgradient = 8;
+
+	a [label="Server"], b [label="Client"];
+
+	--- [label="Le serveur joue"];
+	a=>b [label="LIGNE <x;y;x2;y2;...;xn;yn>"];
+	a=>b [label="NOEUD x;y"];
+	a=>b [label="MSG Au client de jouer"];
+
+	--- [label="Le client joue"];
+	b=>a [label="LIGNE <x;y;x2;y2;...;xn;yn>"];
+	a->a [label="Verification de la ligne"];
+
+	# si c'est bon
+	--- [label="Ligne valide", linecolor="#008800", textcolor="#008800"];
+	a=>b [label="LIGNE <x;y;x2;y2;...;xn;yn>", linecolor="#008800", textcolor="#008800"];
+	a=>b [label="NOEUD x;y", linecolor="#008800", textcolor="#008800"];
+	a=>b [label="MSG Le serveur joue", linecolor="#008800", textcolor="#008800"];
+	b->b [label="Redemarre sur 'le serveur joue'", linecolor="#008800", textcolor="#008800"];
+
+	# si ca fail
+	--- [label="Ligne non-valide", textcolor="red", linecolor="red"];
+	a=>b [label="FAIL <message d'erreur>", textcolor="red", linecolor="red"];
+	b->b [label="Redemarre sur 'le client joue'", textcolor="red", linecolor="red"];
+
+	...;
+
+	--- [label="Fin de partie"];
+	a=>b [label="MSG Fin de partie"];
+}

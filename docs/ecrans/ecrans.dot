@@ -1,0 +1,37 @@
+digraph G {
+
+	accueil [label="Ecran Accueil"];
+	quit [label="Ecran Quitter"];
+	jouer [label="Ecran Jouer"];
+	parametres [label="Ecran Paramètres",color="gray",fontcolor="gray"];
+	scores [label="Ecran des scores",color="gray",fontcolor="gray"];
+	local [label="Ecran jeu local"];
+	server [label="Ecran jeu réseau (serveur)"];
+	client [label="Ecran jeu réseau (client)"];
+	end [label="Fin",color="red",fontcolor="red"];
+	game [label="Ecran de jeu",fontcolor="#008800",color="#008800"];
+
+
+	accueil -> quit [label="Quit"];
+	accueil -> jouer [label="Jouer"];
+	accueil -> parametres [label="Paramètres"];
+	accueil -> scores [label="Scores"];
+
+	quit -> accueil [label="Non",style="dotted",style="dotted"];
+	quit -> end [label="Oui"];
+
+	jouer -> local [label="Jouer en local"];
+	jouer -> server [label="Créer une\npartie réseau"];
+	jouer -> client [label="Rejoindre une\npartie réseau"];
+	jouer -> accueil [label="Retour"];
+
+	local -> accueil [label="Retour",style="dotted"];
+	local -> game [label="Ok"];
+
+	server -> accueil [label="Retour",style="dotted"];
+	server -> game [label="Ok"];
+
+	client -> accueil [label="Retour",style="dotted"];
+	client -> game [label="Jouer !"];
+
+}

@@ -1,0 +1,8 @@
+msc {
+	arcgradient = 8;
+
+	a [label="Server"], b [label="Client"];
+
+	a=>b [label="PING"];
+	b=>a [label="PONG"];
+}
