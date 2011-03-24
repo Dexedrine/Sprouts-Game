@@ -253,10 +253,10 @@ class PointApp(App):
         cette fonction return un layout
         '''
         layout = BoxLayout(orientation='vertical', padding=100, spacing =5)
-        btnPlay = Button(text='Play')
+        btnPlay = Button(text='Jouer')
         btnScores = Button(text='Scores')
-        btnSettings = Button(text='Settings')
-        btnQuit = Button(text='Quit')
+        btnSettings = Button(text='Paramètres')
+        btnQuit = Button(text='Quitter')
         layout.add_widget(btnPlay)
         layout.add_widget(btnScores)
         layout.add_widget(btnSettings)
@@ -285,9 +285,9 @@ class PointApp(App):
     def create_rsx(self, *args):
         layout = BoxLayout(orientation='vertical', padding=100, spacing =5)
         btnLocal = Button(text='Jouer en local')
-        btnRsxS = Button(text='Jouer en réseau, être server')
-        btnRsxC = Button(text='Jouer en réseau, être client')
-        btnQuit = Button(text='Quit')
+        btnRsxS = Button(text='Créer une partie réseau')
+        btnRsxC = Button(text='Rejoindre une partie réseau')
+        btnQuit = Button(text='Retour')
         layout.add_widget(btnLocal)
         layout.add_widget(btnRsxS)
         layout.add_widget(btnRsxC)
@@ -652,8 +652,8 @@ class PointApp(App):
         on crée deux boutons pour la confirmation : oui ou non
         '''
         layout = BoxLayout(orientation='vertical', padding=100, spacing=5)
-        self.btnYes=Button(text='Yes')
-        self.btnNo=Button(text='No')
+        self.btnYes=Button(text='Oui')
+        self.btnNo=Button(text='Non')
         layout.add_widget(self.btnYes)
         layout.add_widget(self.btnNo)
         return layout
