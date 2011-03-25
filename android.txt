@@ -1,0 +1,3 @@
+title=Sprouts Game
+author=Lucie Meresse
+orientation=portrait

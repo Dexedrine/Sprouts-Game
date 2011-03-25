@@ -21,7 +21,164 @@
     canvas:
         Color:
         #si valid : vert sinon rouge
-            rgb:(0, 1, 0) 
+            rgb:(0, 1, 0)
         #pour une courbe ==> creer un objet graphique
         Line:
             points: self.points
+
+#
+# Déclarations des écrans de jeu
+#
+<MenuScreen>:
+	BoxLayout:
+		orientation: 'vertical'
+		padding: 100
+		spacing: 5
+
+		Button:
+			text: 'Jouer'
+			on_release: root.app.show('selectmode')
+		Button:
+			text: 'Scores'
+		Button:
+			text: 'Settings'
+		Button:
+			text: 'Quit'
+			on_release: root.app.show('quit')
+
+
+<QuitScreen>:
+	BoxLayout:
+		orientation: 'vertical'
+		padding: 100
+		spacing: 5
+
+		Button:
+			text: 'Oui'
+			on_release: root.app.stop()
+		Button:
+			text: 'Non'
+			on_release: root.app.show('menu')
+
+
+<SelectModeScreen>:
+	BoxLayout:
+		orientation: 'vertical'
+		padding: 100
+		spacing: 5
+
+		Button:
+			text: 'Jouer en local'
+			on_release: root.app.show('localdifficulty')
+		Button:
+			text: 'Créer une partie réseau'
+			on_release: root.app.show('serverdifficulty')
+		Button:
+			text: 'Rejoindre une partie réseau'
+			on_release: root.app.show('client')
+		Button:
+			text: 'Retour'
+			on_release: root.app.show('menu')
+
+
+<LocalDifficultyScreen,ServerDifficultyScreen>:
+	BoxLayout:
+		orientation: 'vertical'
+		padding: 100
+		spacing: 5
+
+		BoxLayout:
+			orientation: 'horizontal'
+			size_hint_y: None
+			height: 50
+
+			Label:
+				text: 'Difficulté : %d' % slider.value
+				size_hint_x: None
+
+			Slider:
+				id: slider
+				orientation: 'horizontal'
+				min: 0
+				max: 10
+				value: 3
+
+		Button:
+			text: 'Jouer !'
+			on_release: root.app.create_game(slider.value) if root.is_local else root.app.start_server(slider.value)
+
+		Button:
+			text: 'Retour'
+			on_release: root.app.show('selectmode')
+
+<ErrorScreen>:
+	BoxLayout:
+		orientation: 'vertical'
+		padding: 100
+		spacing: 5
+
+		Label:
+			text: root.msg
+		Button:
+			text: 'Ok'
+			on_release: root.app.show('menu')
+
+<ClientScreen>:
+	AnchorLayout:
+		BoxLayout:
+			orientation: 'vertical'
+			spacing: 5
+			size_hint: (None, None)
+			size: (400, 80)
+
+			BoxLayout:
+				orientation: 'horizontal'
+				size_hint_y: None
+				height: 30
+
+				Label:
+					text: 'Hôte ou adresse IP : '
+
+				TextInput:
+					id: hostinput
+					multiline: False
+					text: '127.0.0.1'
+
+			BoxLayout:
+				orientation: 'horizontal'
+				spacing: 5
+
+				Button:
+					text: 'Retour'
+					on_release: root.app.show('selectmode')
+
+				Button:
+					text: 'Jouer !'
+					on_release: root.app.start_client(hostinput.text)
+
+<ClientWaitScreen>:
+	BoxLayout:
+		orientation: 'vertical'
+		padding: 100
+		spacing: 5
+
+		Label:
+			text: 'Connexion au serveur en cours...'
+
+		Button:
+			text: 'Déconnexion'
+			on_release: root.app.stop_client()
+
+<ServerWaitScreen>:
+	BoxLayout:
+		orientation: 'vertical'
+		padding: 100
+		spacing: 5
+
+		Label:
+			text: 'En attente d\'un client...'
+
+		Button:
+			text: 'Quitter'
+			on_release: root.app.stop_server()
+

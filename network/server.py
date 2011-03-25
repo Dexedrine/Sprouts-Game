@@ -21,11 +21,24 @@ class SproutsServer(SproutsNetwork):
         #le port est ouvert sur ttes les cartes rsx avec le 0.0.0.0
         sockServer.bind(('0.0.0.0', self.port))
 
-        #nombre de client accepté = 1
+        # nombre de client accepté = 1
+        # on met un timeout très petit,  afin de régulièrement regarder si on
+        # doit quitter ou non
+        sockServer.settimeout(.05)
         sockServer.listen(1)
 
         print 'Server: en attente d\'un client...'
-        sockClient, addressClient = sockServer.accept()
+        addressClient = None
+        while not self.quit:
+            try:
+                sockClient, addressClient = sockServer.accept()
+                break
+            except:
+                pass
+
+        if addressClient is None:
+            print 'Server: annulation du serveur'
+            return None
 
         print 'Server: client connecté, provenant de', addressClient
         return sockClient

@@ -66,6 +66,9 @@ class SproutsNetwork(Thread):
                 for c in commandes:
                     self.queue.appendleft(c)
 
+        except socket.error, s:
+            self.queue.appendleft('SOCKETERROR %s' % str(s))
+
         finally:
             self.queue.appendleft('SOCKETCLOSED')
             if self.sock is not None:
